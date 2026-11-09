@@ -1,5 +1,5 @@
 # Implementation plan
-M0/M1-A are complete. M1-B is authorized by the latest user instruction and explicit local-credential approval. M2 and later work require separate authorization. Each milestone updates progress, records material decisions and reports actual checks/failures.
+M0/M1 are complete. Latest user instruction authorizes M2 team lifecycle and its frontend slice. M3 and later work require separate authorization. Each milestone updates progress, records material decisions and reports actual checks/failures.
 
 | Milestone | Dependency | Acceptance gate |
 |---|---|---|
@@ -7,8 +7,8 @@ M0/M1-A are complete. M1-B is authorized by the latest user instruction and expl
 | M1 Foundation | Approved M0 | Java/React skeleton, migrations, CI; tooling checks pass |
 | M1-A Foundation subset | Current user authorization | Backend compile/test, frontend typecheck/build, database migration verification; blockers recorded honestly |
 | M1-B Authentication/profiles | M1-A gate passed; local credentials approved | Full participant flow, Java 21 verify, frontend checks and PostgreSQL verification |
-| M2 Identity/events | M1; provider choice | Authentication, permissions, profiles, configured event limits tested |
-| M3 Core membership | M2 | Create/leave/succession/deletion, idempotency and audit invariants tested |
+| M2 Team lifecycle | Reverified M1 | Additive constraints, create/edit/leave/remove/succession/deletion/audit, dashboard; Java21 real-PostgreSQL and frontend gates |
+| M3 Concurrency/idempotency | Reviewed M2; new authorization | Persisted replay, race/rollback coverage and explicit last-seat acceptance; scope admission APIs only when authorized |
 | M4 Admission/removal | M3 | Requests, invites, removal; 50-contender test passes |
 | M5 Discovery | M4 | Board pagination and explainable ranking tested |
 | M6 Live updates | M5 | Authorized SSE, disconnect/refetch recovery tested |
@@ -19,4 +19,4 @@ M0/M1-A are complete. M1-B is authorized by the latest user instruction and expl
 Priority: concurrency correctness first, defensible decisions second, quality/tests/UX third. No gate may substitute planned checks for observed results.
 
 
-M2 security gate includes permission integration and validation; the latest M1-B scope moves authentication and participant profiles ahead of M2 event work. M4 tests invite entropy and expiry, all admission lock paths and leader-only removal. M8 validates rate limits and seed constraints plus strict LOAD-01. M9 requires verified hosting/free-tier constraints, DEPLOY-01 and SUBMIT-01. M0 completion alone authorizes no later milestone; M1-B now has explicit authorization.
+The latest scope places identity/profiles in M1-B and lifecycle/removal in M2. M3 covers explicitly requested concurrency/idempotency acceptance; later admission scope still requires authorization. M8 validates rate limits, large seed constraints and strict LOAD-01. M9 requires verified hosting/free-tier constraints, DEPLOY-01 and SUBMIT-01. M2 completion does not authorize M3.

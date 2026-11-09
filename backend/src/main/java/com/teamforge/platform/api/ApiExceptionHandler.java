@@ -9,9 +9,16 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+    @ExceptionHandler({ConstraintViolationException.class, MethodArgumentTypeMismatchException.class})
+    ResponseEntity<ApiErrors.ErrorBody> parameters() {
+        return ResponseEntity.badRequest().body(ApiErrors.body(
+            "INVALID_REQUEST", "Check the request parameters.", Map.of()));
+    }
     @ExceptionHandler(ApiException.class)
     ResponseEntity<ApiErrors.ErrorBody> application(ApiException error) {
         return ResponseEntity.status(error.status())

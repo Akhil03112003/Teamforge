@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ApiError, currentUser, getHealth, logout, type Participant } from './api/client';
 import AuthForm from './components/AuthForm';
 import ProfileForm from './components/ProfileForm';
+import TeamDashboard from './components/TeamDashboard';
 
 type Connection = 'checking' | 'connected' | 'unavailable';
 
@@ -15,6 +16,7 @@ export default function App() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [notice, setNotice] = useState('');
   const [signingOut, setSigningOut] = useState(false);
+  const [view, setView] = useState<'teams' | 'profile'>('teams');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -63,17 +65,22 @@ export default function App() {
       <main id="main" tabIndex={-1} className={user ? 'profile-page' : ''}>
         {restoring ? <p role="status">Restoring your session…</p> : sessionError ?
           <section><p role="alert">{sessionError}</p><button type="button" onClick={() => setSessionAttempt(value => value + 1)}>Try again</button></section> :
-          user ? <section aria-labelledby="profile-heading">
+          user ? <>
+          <nav className="participant-nav" aria-label="Participant views">
+            <button className="secondary" type="button" aria-pressed={view === 'teams'} onClick={() => setView('teams')}>Teams</button>
+            <button className="secondary" type="button" aria-pressed={view === 'profile'} onClick={() => setView('profile')}>Your profile</button>
+          </nav>
+          {view === 'teams' ? <TeamDashboard key={user.id} user={user} onSessionExpired={() => { setUser(null); setNotice('Your session expired. Please sign in again.'); }} /> : <section aria-labelledby="profile-heading">
             <h1 id="profile-heading" className="profile-title">Your participant profile</h1>
             <p>Tell future teammates what you bring and when you can collaborate.</p>
             <ProfileForm profile={user.profile}
               onSaved={profile => setUser(previous => previous ? { ...previous, profile } : previous)}
               onSessionExpired={() => { setUser(null); setNotice('Your session expired. Please sign in again.'); }} />
-          </section> : <>
+          </section>}</> : <>
         <section aria-labelledby="welcome">
           <h1 id="welcome">Good teams<br />start with<br /><em>connection.</em></h1>
           <p className="intro">A place to find the people who bring something different to your hackathon team.</p>
-          <p className="scope">Create your profile today. Team discovery is coming in a later milestone.</p>
+          <p className="scope">Create your profile, start a team and keep your roster organized.</p>
         </section>
         <AuthForm key={mode} mode={mode} notice={notice} onModeChange={next => { setMode(next); setNotice(''); }}
           onAuthenticated={value => { setUser(value); setNotice(''); }}

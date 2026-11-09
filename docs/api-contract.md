@@ -1,8 +1,27 @@
 # Proposed API contract
+
+## M2 implemented team contracts (current)
+All routes below require the existing authenticated session. Every mutation requires CSRF. M2 does not require/acknowledge Idempotency-Key; persisted replay semantics remain M3. Earlier tables include future proposed endpoints that remain unavailable.
+
+| Operation | Endpoint (prefix /api/v1) | Result |
+|---|---|---|
+| HACKATHONS | GET /hackathons | {items:[{id,name,minSize,maxSize,active}]}, first100 |
+| BOARD | GET /hackathons/{event}/teams?limit=50&cursor={uuid} | {items:[summary],nextCursor}; UUID order, maximum50; no skill/openSeats filter yet |
+| MINE | GET /hackathons/{event}/me/team | 200 team or 204 without event membership |
+| CREATE | POST /hackathons/{event}/teams | {name,description?,desiredSkills?}; 201 team; creator becomes member/leader atomically |
+| TEAM | GET /teams/{id} | team details and ordered roster |
+| MEMBERS | GET /teams/{id}/members | {items:[{userId,displayName,joinedAt,leader}]} |
+| EDIT | PATCH /teams/{id} | Partial {name,description,desiredSkills}; current leader only; 200 team |
+| LEAVE | DELETE /teams/{id}/members/me | {teamId,deleted,leaderId}; successor or final deletion |
+| REMOVE | DELETE /teams/{id}/members/{user} | Current leader removing another member; 204 |
+| AUDIT | GET /teams/{id}/audit-events?offset=0&limit=50 | Current/former participants only, including after deletion; max100, offset0..1000000 |
+
+Team shape: {id,hackathonId,name,description,desiredSkills,leaderId,status,minSize,maxSize,members}; status INCOMPLETE below minimum, otherwise READY. Summary replaces roster with memberCount and omits desiredSkills/hackathonId. Audit items: {id,actorId,action,targetType,targetId,timestamp}; actions TEAM_CREATED, DETAILS_UPDATED, MEMBER_LEFT, MEMBER_REMOVED, LEADERSHIP_TRANSFERRED, TEAM_DELETED. Empty desiredSkills clears it; null/absent PATCH fields stay unchanged; no-op PATCH adds no audit.
+Errors use existing safe envelope: 400 invalid fields/parameters or supplied actor/leader identity; 401 anonymous; 403 NOT_A_MEMBER/LEADER_REQUIRED/AUDIT_FORBIDDEN; 404 missing event/team/member; 409 ALREADY_TEAMED/TEAM_CONFLICT or USE_LEAVE for self-removal. Deleted team detail/roster returns404 while authorized history stays readable. No public join/invite/request endpoint was added. Lost-response retries may return conflict/not-found; replay-after-deletion is not yet protected by persisted idempotency.
 Base /api/v1. JSON except the standard form-encoded login. Approved Spring Security server-managed sessions and local email/password identity. Secure, HttpOnly session cookies and CSRF protection are required for mutations. Never trust client actor/role values.
 IDs are opaque strings; timestamps UTC ISO-8601. Error shape: {code,message,requestId,fieldErrors?}; never expose SQL or invite secrets.
 
-M1-A adds public GET /api/v1/health: 200 {"status":"UP"} for process liveness, plus status-only Actuator health/liveness/readiness (readiness includes PostgreSQL). These responses do not use the proposed business error envelope. Backend runtime verification is blocked; these are implemented source contracts, not observed endpoint results. Business endpoints below remain unimplemented and access is denied; authentication flows wait for M1-B.
+Public GET /api/v1/health returns 200 {"status":"UP"}; Actuator readiness includes PostgreSQL. These do not use the business error envelope. M1/M2 runtime verification now passes; the high-level table below includes future admission/suggestion/SSE routes, not implemented by the current lifecycle slice.
 
 | Operation ID | Endpoint | Input / result |
 |---|---|---|
@@ -38,7 +57,7 @@ All paths have /api/v1 prefix. Fetch a new CSRF token before each mutation. Cook
 
 Profile: {displayName,timeZone,skills:["java"],collaborationWindows:[{day:"MONDAY",start:"09:00",end:"17:00"}]}. Day is an uppercase DayOfWeek; times are local HH:mm in the named zone. Empty arrays clear collections; absent/null fields remain unchanged. See decisions.md for limits. Invalid inputs/unknown identity fields return 400; duplicate normalized email 409 IDENTITY_CONFLICT; optimistic profile conflict 409 PROFILE_CHANGED; absent/invalid CSRF 403 CSRF_INVALID; wrong/unknown login identically 401 INVALID_CREDENTIALS; auth throttling 429 RATE_LIMITED with Retry-After. Error bodies contain code/message/requestId/fieldErrors, never raw submitted secrets or SQL.
 
-The M1-A runtime-blocked note earlier is historical: Java 21 gate now passes. Actuator root also lists public probe group names; component/connection details remain hidden. Team/business endpoints remain unimplemented.
+Java 21 gates now pass. Actuator root also lists public probe group names; component/connection details remain hidden. M2 lifecycle routes are implemented as above; admission/suggestion/live routes remain unavailable.
 
 
 ## Approved lifecycle and scoring

@@ -29,6 +29,10 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.GET, "/api/v1/auth/csrf").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
                 .requestMatchers("/api/v1/me", "/api/v1/me/profile").authenticated()
+                .requestMatchers("/api/v1/hackathons", "/api/v1/hackathons/*/teams",
+                    "/api/v1/hackathons/*/me/team", "/api/v1/teams/*",
+                    "/api/v1/teams/*/members", "/api/v1/teams/*/members/*",
+                    "/api/v1/teams/*/audit-events").authenticated()
                 .anyRequest().denyAll())
             .requestCache(cache -> cache.disable())
             .sessionManagement(session -> session.sessionFixation(fixation -> fixation.changeSessionId()))

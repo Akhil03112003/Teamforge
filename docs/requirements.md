@@ -1,5 +1,7 @@
 # Requirements and acceptance
 
+M2 traceability (latest scope): REQ-01/02/05/06/07/12 are implemented for lifecycle paths, with REQ-11 authorization/CSRF and REQ-17's minimal dashboard. TeamLifecycleIntegrationTest has 27 real-PostgreSQL cases covering create/duplicate/cross-event/bounds/leader succession/delete/remove/security/audit/rollback and paging. Evidence: verification-m2.md. REQ-08 (50 contenders) and REQ-09's persisted replay are reserved for M3; no race/load benchmark result is claimed. The original M0 table's milestone placement is superseded by the latest implementation-plan.md.
+
 M1-B traceability: REQ-11 now includes local registration/login/logout/restoration, session-derived private profiles, CSRF and bounded auth-IP throttling; REQ-17 includes participant forms only (team UI remains M7). Evidence: ParticipantIntegrationTest (28 API cases), HealthIntegrationTest (3 HTTP checks), DatabaseIntegrationTest (2 integration checks), AuthRateLimitFilterTest (1 unit check), frontend typecheck/build and local proxy flow. Actual outcomes: verification-m1-b.md. No future team requirement or remote CI result is claimed.
 Mandatory unless identified as approved default. Details: [product](product-spec.md), [API](api-contract.md), [tests](test-plan.md).
 

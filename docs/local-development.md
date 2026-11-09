@@ -1,4 +1,4 @@
-# M1-A local development (Windows PowerShell)
+# TeamForge local development (M1/M2)
 Requires JDK 21, Maven >=3.6.3, Node 24 LTS/npm, and reachable local PostgreSQL. Docker is optional. Java must be a JDK, not just a JRE. Dependency installation needs registry access unless all required artifacts are cached.
 
 ## Database and backend
@@ -120,3 +120,7 @@ $env:BACKEND_ORIGIN = 'http://127.0.0.1:8081'
 npm.cmd run dev -- --port 5174
 ```
 Every backend terminal loads .env itself. BACKEND_ORIGIN is only a development proxy setting. Do not enable the local cookie profile in deployment. No Docker is required with reachable local PostgreSQL.
+
+## M2 team dashboard
+Restart the backend from this checkout after verify; Flyway applies additive V3 automatically. An empty TeamForge Demo hackathon is provided without overwriting existing events. Sign in and use Teams to select an event, create/view/edit a team, leave, and read retained history. Your profile/logout remain available. Joining/invites/SSE are not present, so multi-member succession/removal is currently demonstrated with integration-test fixtures; no admission shortcut is exposed.
+The Java21 clean-verify command above now runs 61 tests with TEAMFORGE_DATABASE_TESTS=true. Inspect .tmp/backend-verify/surefire-reports for the isolated run. No database reset, V1/V2 rewrite or large seed is needed. The 50-contender test is reserved for M3.

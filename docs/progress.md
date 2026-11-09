@@ -1,6 +1,17 @@
 # Progress
 
-## Current status — M1-B review handoff
+## Current status — M2 review handoff
+M0/M1 complete. M2 implemented and automated/backend/proxy gates passed; browser visual/keyboard runtime review remains unavailable. M3–M9 not started. Stop before M3.
+- Initial Git tree clean at 857528f. Reverified M1 Java21 clean verify: all34 tests passed before M2 changes.
+- Additive V3: participant anchors, teams, team_members, immutable audit snapshots, event-aware uniqueness/FKs, deferred leader membership, capacity guard and an empty demo event. V1/V2 unchanged. No reset/replacement of existing data.
+- Team API supports authenticated create/read/roster/edit/leave/current-leader removal, deterministic succession and final-member deletion with retained authorized audit history. All membership writes lock participant anchors before the team and recheck authority. No joining/invites/requests/SSE/suggestions.
+- Final Java21 clean verify: 61 tests, 0 failures/errors/skips, executable packaging successful; 27 new real-PostgreSQL lifecycle cases. Frontend typecheck/build passed. Existing 34 tests remain green.
+- Packaged app/Vite proxy verified login/profile/restoration/logout plus team create/my-team/roster/edit/audit, duplicate/self-removal conflict and final deletion/retained history. Only synthetic fixtures and smoke-owned servers were cleaned; audit snapshots remain immutable and existing services continue running.
+- Browser host unavailable; no visual/keyboard runtime, GitHub Actions, deployment or load benchmark result claimed. Native PostgreSQL18.6 still emits Flyway tested-version warning (CI image17.7 not run locally).
+- M3 outstanding: persisted idempotency/replay/lost-response semantics and concurrent create/admit/leave/remove/leadership/deletion races. The 50-contender last-seat test has NOT run and is not claimed passed. No commit/push or dependency changes.
+- See [M2 verification](verification-m2.md), [decisions](decisions.md), [API](api-contract.md) and [database](database-design.md).
+
+## Historical M1-B review handoff
 M0/M1-A complete. M1-B implemented; automated gates passed, with browser visual/keyboard runtime review unavailable. M2–M9 not started. Stop for review before M2.
 - User approved local email/password. Registration/login/logout/restoration and private participant profiles implemented; server-managed sessions, BCrypt, CSRF and bounded auth-IP rate limiting. No team workflows/SSE/suggestions.
 - Before coding, reverified M1-A on installed JDK 21.0.13.9: five tests with no skips, executable packaging, backend/readiness/proxy HTTP 200. Earlier missing-JDK/plugin blockers are resolved.

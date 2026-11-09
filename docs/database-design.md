@@ -1,16 +1,25 @@
 # Proposed database design
 
-Current status: M1-A V1/Flyway has been verified on Java 21. M1-B implements the additive identity/profile schema below; the remaining team workflow model is still proposed. Earlier blocked-runtime wording is historical.
-The full design remains proposed. M1-A adds only the hackathons migration and JPA mapping; no other tables are implemented. Direct SQL was checked against isolated PostgreSQL; Flyway/application execution remains blocked. See [architecture](architecture.md) for lock protocol and [verification](verification-m1-a.md) for evidence.
+## M2 implemented schema (current)
+V3 is additive; V1/V2 unchanged. The older proposed table list below remains context for future admission/idempotency work.
+- event_participants: PK(hackathon_id,user_id), FKs to hackathons/users; persistent per-event/person lock anchor retained after departure.
+- teams: UUID PK, hackathon FK, name/description/desired_skills, leader_user_id and created_at; UNIQUE(hackathon_id,id); leader references an event participant.
+- team_members: UUID PK, joined_at; UNIQUE(hackathon_id,user_id) enforces one membership per event, UNIQUE(team_id,user_id) supports leader FK. Composite FKs enforce matching team/event and participant/event. Team deletion cascades only active memberships.
+- teams_leader_is_member: deferred FK (team.id,leader_user_id) -> team_members(team_id,user_id). Creation, succession and final deletion satisfy this at commit; active teams cannot be left leaderless.
+- Capacity BEFORE INSERT/UPDATE trigger locks the destination team and checks actual membership count against its hackathon maximum. Application paths acquire participant anchors first; the trigger is defense in depth, not an alternative protocol. Minimum remains derived readiness.
+- audit_events: immutable UUID/event/team/actor/action/target-type/target-ID/timestamp snapshots; no active-record FKs. UPDATE/DELETE/TRUNCATE triggers reject mutation. Team deletion retains all history. Index(team_id,occurred_at DESC,id DESC) supports authorized pagination.
+Indexes include teams(hackathon_id,id) for keyset discovery and team_members(team_id,joined_at,id) for stable succession. A single empty demo event is inserted on ID conflict-do-nothing, without replacing existing data. No idempotency/request/invite table is added in M2.
+
+The logical model below includes future admission/idempotency tables. Current implemented mappings are recorded in the M2/M1-B sections; historical foundation blocking conditions are resolved. See architecture.md for the lock protocol and verification-m2.md for execution evidence.
 
 | Table | Relationships and constraints |
 |---|---|
-| users | Internal ID; unique identity issuer/subject; display name; no provider chosen |
+| users | Internal ID, unique normalized local email and password hash; approved local identity |
 | hackathons | ID, minimum >=1, maximum >= minimum, active status |
 | event_participants | User/event FKs; unique(event,user); stable membership lock anchor |
 | profiles / skills / profile_skills | Time zone and collaboration windows; unique user/skill association |
 | teams | Event FK, name, desired skills, created time; leader participant reference |
-| memberships | Team and participant references, event, joined time; unique(event,user) |
+| team_members | Team and participant references, event, joined time; unique(event,user) |
 | join_requests | Team/applicant, state, timestamps; partial unique(team,applicant) WHERE pending |
 | invites | Team, unique token hash, expiry, revoked timestamp |
 | idempotency_records | Unique(actor,operation,key), request hash, status/result, timestamps |

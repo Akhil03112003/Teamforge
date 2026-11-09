@@ -55,4 +55,25 @@ input[aria-invalid="true"] { border: 2px solid #a03423; }
 .connection-footer { width: min(1120px, calc(100% - 48px)); margin-inline: auto; padding-block: 24px; }
 .connection-footer [role="status"] { min-height: 0; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.participant-nav, .dashboard-toolbar { display: flex; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+.participant-nav [aria-pressed="true"] { background: #1c3029; color: #fff; }
+.dashboard-toolbar .field { flex: 1; max-width: 520px; margin: 0; }
+.team-workspace { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 48px; align-items: start; margin-top: 36px; }
+textarea { display: block; width: 100%; border: 1px solid #758778; border-radius: 6px; padding: 10px 12px; font: inherit; color: #1c3029; background: #fff; resize: vertical; }
+.team-details { margin-top: 28px; padding-top: 20px; border-top: 1px solid #b9c1b7; overflow-wrap: anywhere; }
+.team-details h2, .team-board h2 { margin-top: 0; }
+.team-details form { margin-top: 36px; }
+.member-list, .team-board ul { list-style: none; padding: 0; }
+.member-list li { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; border-bottom: 1px solid #b9c1b7; }
+.team-board li { border-bottom: 1px solid #b9c1b7; }
+.team-select { background: transparent; color: #1c3029; border-radius: 0; width: 100%; text-align: left; padding-block: 18px; overflow-wrap: anywhere; }
+.team-select strong, .team-select span { display: block; }
+.team-select span { font-size: .875rem; font-weight: 400; }
+.team-select:hover:not(:disabled), .team-select[aria-pressed="true"] { background: #dce7d4; }
+.team-select:disabled { color: #fff; }
+.confirmation { padding: 20px; margin-block: 20px; background: #ece9da; border-radius: 8px; }
+.confirmation button { margin: 4px 12px 4px 0; }
+.team-history { border-top: 1px solid #b9c1b7; padding-top: 28px; margin-top: 36px; }
+.team-history li { margin-block: 12px; overflow-wrap: anywhere; }
+@media (max-width: 850px) { .team-workspace { grid-template-columns: 1fr; gap: 24px; } .member-list li { align-items: start; flex-wrap: wrap; } }
 @media (max-width: 720px) { .profile-grid { grid-template-columns: 1fr; gap: 0; } .availability-row { grid-template-columns: 1fr 1fr; padding-block: 16px; border-bottom: 1px solid #b9c1b7; } .form-actions { flex-wrap: wrap; gap: 12px; } }

@@ -75,6 +75,71 @@ export async function updateProfile(profile: Partial<Profile>): Promise<Profile>
   return profileResponse(await mutate('/me/profile', JSON.stringify(profile), 'application/json', 'PATCH'));
 }
 
+export interface Hackathon { id: string; name: string; minSize: number; maxSize: number; active: boolean }
+export interface TeamMember { userId: string; displayName: string; joinedAt: string; leader: boolean }
+export interface TeamSummary {
+  id: string; name: string; description: string; leaderId: string;
+  status: 'INCOMPLETE' | 'READY'; minSize: number; maxSize: number; memberCount: number;
+}
+export interface Team extends Omit<TeamSummary, 'memberCount'> { hackathonId: string; desiredSkills: string[]; members: TeamMember[] }
+export interface TeamInput { name: string; description: string; desiredSkills: string[] }
+export interface AuditEvent { id: string; actorId: string; action: string; targetType: 'TEAM' | 'USER'; targetId: string; timestamp: string }
+function object(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new ApiError('Unexpected server response. Reload and try again.');
+  return value as Record<string, unknown>;
+}
+function text(value: unknown): string { if (typeof value !== 'string') throw new ApiError('Unexpected text in server response.'); return value; }
+function count(value: unknown): number { if (typeof value !== 'number' || !Number.isInteger(value) || value < 0) throw new ApiError('Unexpected count in server response.'); return value; }
+function list(value: unknown): unknown[] { if (!Array.isArray(value)) throw new ApiError('Unexpected list in server response.'); return value; }
+function readiness(value: unknown): TeamSummary['status'] { if (value !== 'INCOMPLETE' && value !== 'READY') throw new ApiError('Unexpected team readiness.'); return value; }
+function teamResponse(value: unknown): Team {
+  const team = object(value);
+  return { id: text(team.id), hackathonId: text(team.hackathonId), name: text(team.name), description: text(team.description),
+    leaderId: text(team.leaderId), status: readiness(team.status), minSize: count(team.minSize), maxSize: count(team.maxSize),
+    desiredSkills: list(team.desiredSkills).map(text), members: list(team.members).map(value => {
+      const member = object(value); if (typeof member.leader !== 'boolean') throw new ApiError('Unexpected member role.');
+      return { userId: text(member.userId), displayName: text(member.displayName), joinedAt: text(member.joinedAt), leader: member.leader };
+    }) };
+}
+export async function listHackathons(): Promise<Hackathon[]> {
+  return list(object(await request('/hackathons')).items).map(value => {
+    const event = object(value); if (typeof event.active !== 'boolean') throw new ApiError('Unexpected event state.');
+    return { id: text(event.id), name: text(event.name), minSize: count(event.minSize), maxSize: count(event.maxSize), active: event.active };
+  });
+}
+export async function listTeams(event: string, cursor?: string): Promise<{ items: TeamSummary[]; nextCursor: string | null }> {
+  const result = object(await request('/hackathons/' + encodeURIComponent(event) + '/teams?limit=50' + (cursor ? '&cursor=' + encodeURIComponent(cursor) : '')));
+  return { items: list(result.items).map(value => {
+    const team = object(value); return { id: text(team.id), name: text(team.name), description: text(team.description), leaderId: text(team.leaderId),
+      status: readiness(team.status), minSize: count(team.minSize), maxSize: count(team.maxSize), memberCount: count(team.memberCount) };
+  }), nextCursor: result.nextCursor === null ? null : text(result.nextCursor) };
+}
+export async function myTeam(event: string): Promise<Team | null> {
+  const result = await request('/hackathons/' + encodeURIComponent(event) + '/me/team');
+  return result === undefined ? null : teamResponse(result);
+}
+export async function getTeam(id: string): Promise<Team> { return teamResponse(await request('/teams/' + encodeURIComponent(id))); }
+export async function createTeam(event: string, input: TeamInput): Promise<Team> {
+  return teamResponse(await mutate('/hackathons/' + encodeURIComponent(event) + '/teams', JSON.stringify(input)));
+}
+export async function updateTeam(id: string, input: Partial<TeamInput>): Promise<Team> {
+  return teamResponse(await mutate('/teams/' + encodeURIComponent(id), JSON.stringify(input), 'application/json', 'PATCH'));
+}
+export async function leaveTeam(id: string): Promise<{ deleted: boolean; leaderId: string | null }> {
+  const response = object(await mutate('/teams/' + encodeURIComponent(id) + '/members/me', undefined, 'application/json', 'DELETE'));
+  if (typeof response.deleted !== 'boolean') throw new ApiError('Unexpected departure response. Refresh your dashboard.');
+  return { deleted: response.deleted, leaderId: response.leaderId === null ? null : text(response.leaderId) };
+}
+export async function removeTeamMember(team: string, member: string): Promise<void> {
+  await mutate('/teams/' + encodeURIComponent(team) + '/members/' + encodeURIComponent(member), undefined, 'application/json', 'DELETE');
+}
+export async function teamAudit(id: string, offset = 0): Promise<AuditEvent[]> {
+  return list(object(await request('/teams/' + encodeURIComponent(id) + '/audit-events?limit=50&offset=' + offset)).items).map(value => {
+    const event = object(value); if (event.targetType !== 'TEAM' && event.targetType !== 'USER') throw new ApiError('Unexpected audit target.');
+    return { id: text(event.id), actorId: text(event.actorId), action: text(event.action), targetType: event.targetType, targetId: text(event.targetId), timestamp: text(event.timestamp) };
+  });
+}
+
 export async function getHealth(signal?: AbortSignal): Promise<HealthResponse> {
   const response = await fetch('/api/v1/health', {
     signal,
