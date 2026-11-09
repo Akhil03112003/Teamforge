@@ -1,0 +1,43 @@
+package com.teamforge.platform.api;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class ApiExceptionHandler {
+    @ExceptionHandler(ApiException.class)
+    ResponseEntity<ApiErrors.ErrorBody> application(ApiException error) {
+        return ResponseEntity.status(error.status())
+            .body(ApiErrors.body(error.code(), error.getMessage(), Map.of()));
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    ResponseEntity<ApiErrors.ErrorBody> validation(MethodArgumentNotValidException error) {
+        var fields = new LinkedHashMap<String, String>();
+        error.getBindingResult().getFieldErrors().forEach(field ->
+            fields.putIfAbsent(field.getField(), field.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(ApiErrors.body(
+            "VALIDATION_ERROR", "Check the highlighted fields.", fields));
+    }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<ApiErrors.ErrorBody> malformed() {
+        return ResponseEntity.badRequest().body(ApiErrors.body(
+            "INVALID_REQUEST", "The request body is invalid.", Map.of()));
+    }
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    ResponseEntity<ApiErrors.ErrorBody> duplicate() {
+        return ResponseEntity.status(409).body(ApiErrors.body(
+            "IDENTITY_CONFLICT", "An account with this email already exists.", Map.of()));
+    }
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    ResponseEntity<ApiErrors.ErrorBody> staleProfile() {
+        return ResponseEntity.status(409).body(ApiErrors.body(
+            "PROFILE_CHANGED", "Your profile changed. Reload it and try again.", Map.of()));
+    }
+}

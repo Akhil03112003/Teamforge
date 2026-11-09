@@ -2,7 +2,8 @@
 param(
     [ValidateSet('run', 'compile', 'verify')]
     [string]$Mode = 'run',
-    [string]$JavaHome = $env:JAVA_HOME
+    [string]$JavaHome = $env:JAVA_HOME,
+    [switch]$LocalHttp
 )
 
 $ErrorActionPreference = 'Stop'
@@ -27,10 +28,13 @@ $goal = switch ($Mode) {
     'verify' { 'verify' }
 }
 $previousDatabaseTests = $env:TEAMFORGE_DATABASE_TESTS
+$previousProfiles = $env:SPRING_PROFILES_ACTIVE
 try {
     if ($Mode -eq 'verify') { $env:TEAMFORGE_DATABASE_TESTS = 'true' }
+    if ($LocalHttp) { $env:SPRING_PROFILES_ACTIVE = 'local' }
     & mvn.cmd --batch-mode --no-transfer-progress -f (Join-Path $repositoryRoot 'backend/pom.xml') @goal
     if ($LASTEXITCODE -ne 0) { throw 'Maven failed. See its output; no success is claimed.' }
 } finally {
     $env:TEAMFORGE_DATABASE_TESTS = $previousDatabaseTests
+    $env:SPRING_PROFILES_ACTIVE = $previousProfiles
 }

@@ -1,6 +1,9 @@
 spring:
   application:
     name: teamforge
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   datasource:

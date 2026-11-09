@@ -1,4 +1,16 @@
 # Progress
+
+## Current status — M1-B review handoff
+M0/M1-A complete. M1-B implemented; automated gates passed, with browser visual/keyboard runtime review unavailable. M2–M9 not started. Stop for review before M2.
+- User approved local email/password. Registration/login/logout/restoration and private participant profiles implemented; server-managed sessions, BCrypt, CSRF and bounded auth-IP rate limiting. No team workflows/SSE/suggestions.
+- Before coding, reverified M1-A on installed JDK 21.0.13.9: five tests with no skips, executable packaging, backend/readiness/proxy HTTP 200. Earlier missing-JDK/plugin blockers are resolved.
+- Final M1-B Java 21 isolated clean verify: 34 tests, zero failures/errors/skips, executable JAR packaging succeeded. Flyway V2 applied/validated with V1 unchanged. PostgreSQL 18.6 still triggers the documented Flyway tested-version warning; CI PostgreSQL 17.7 was not run locally.
+- Frontend typecheck/build passed. Packaged backend + Vite proxy verified registration 201, login 204, saved/reloaded profile 200, logout 204 and post-logout 401 against local PostgreSQL. Only synthetic fixtures and smoke-owned processes were cleaned up; existing services remain running.
+- Browser host unavailable; no visual/keyboard runtime or remote CI/deployment/benchmark result claimed. Frontend has labeled controls, focus/error/loading/status states and responsive CSS; browser QA remains a limitation.
+- Read-only user-cache JAR access and IDE error stubs in target were resolved for verification by ignored cache/output isolation. Default Maven/CI output remains target. No application dependency version changes.
+- No credentials changed/displayed; .env stays ignored. No commit/push. See [verification](verification-m1-b.md), [decisions](decisions.md), [startup](local-development.md).
+
+## Historical foundation/recovery notes (superseded by current status above)
 M0: complete ? all 12 existing documents inspected; documentation-only consistency review and traceability checks completed on 2026-11-09. Approved clarifications recorded; proposed mechanics remain labeled. .gitignore added.
 M1: in progress. M1-A recovered with local PostgreSQL; final packaging/Java 21/startup checks remain blocked. M1-B and M2-M9 not started; stop for review.
 

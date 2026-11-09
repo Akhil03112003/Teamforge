@@ -1,4 +1,8 @@
 # Product specification
+
+## M1-B participant journey
+Anonymous visitors can register/sign in and obtain a CSRF token. Registration atomically creates a private default UTC profile, then asks the participant to sign in. Invalid/duplicate identity leaves them signed out. Login rotates the session; reload restores /me; logout invalidates it. Expiry returns the UI to sign-in.
+Authenticated participants retrieve/edit only their own display name, normalized skills, named time zone and optional weekly availability. Profile creation belongs to registration, not a separate public endpoint. Forms provide loading/validation/error states, labeled controls, keyboard focus and responsive rows. Empty arrays clear collections, partial updates retain unspecified fields, and optimistic conflicts request a reload. No other participant ID is accepted. Validation defaults are recorded in decisions.md; team screens remain future work.
 Authority: [requirements](requirements.md). Proposed details require review in [decisions](decisions.md).
 
 ## Roles and permissions

@@ -1,5 +1,13 @@
 # Decisions
 
+## M1-B approval and implementation record — 2026-11-09
+The user explicitly approved local email/password with secure hashing and server-managed sessions. This supersedes the unresolved OIDC choice below; no external provider is needed for this slice. Deployment selection remains open.
+Registration creates account and default UTC profile in one transaction and leaves the participant signed out. Spring Security's form login rotates session ID and persists the security context; logout invalidates the session. BCrypt cost 12, passwords 12–72 characters and at most 72 UTF-8 bytes; emails are validated ASCII, normalized lower-case and database-unique. DTOs never expose password hashes; principal credentials are erased after authentication. Email verification/reset are not implemented in M1-B.
+Production cookies remain Secure/HttpOnly/SameSite=Lax. Explicit local profile permits HTTP cookies only for local development; Start-Backend.ps1 -LocalHttp selects it. Session-backed CSRF covers registration/login/logout/profile changes; client retrieves a fresh token before mutations, including after login/logout rotation. Authentication POSTs share a bounded per-IP limiter (30/minute, 10000 live keys); no forwarded IP trust or external infrastructure. Multi-instance coordination remains future deployment work.
+Profile defaults: display name 1–80 non-control characters; named IANA/tzdb zones, UTC initially; up to 20 normalized ASCII skill tags of 1–40 characters; up to 28 non-overlapping same-day weekly HH:mm windows. Empty arrays clear collections; absent/null PATCH fields stay unchanged. Unknown JSON fields are rejected. Profile identity comes exclusively from the session; optimistic version conflicts return 409.
+V2 adds users/profiles/profile_skills/profile_availability; V1 is unchanged. The earlier shared skills catalog was proposed only; normalized profile tags are sufficient here, with taxonomy deferred. No team/event-management/SSE/suggestion behavior was added.
+M1-A was reverified before work: Java 21 verify and executable packaging passed (five tests, no skips), plus existing backend/readiness/frontend-proxy GETs returned 200. Earlier missing-JDK/plugin blockers are resolved. For M1-B, unchanged cached artifacts were copied to ignored .tmp/m2-local to avoid read-only JAR AccessDeniedException. An overridable teamforge.build.directory isolates verification from IDE-generated error stubs observed in shared target output; default Maven/CI output stays target. No dependency version changed.
+
 ## M1-A implementation record — 2026-11-09
 The user authorized foundation only. Selected Java release 21, Maven and stable Spring Boot 3.5.16 (official compatibility: https://docs.spring.io/spring-boot/3.5/system-requirements.html). Local Java is 24; Java 21 runtime checks remain outstanding. Do not downgrade to old cached backend dependencies merely to obtain a local build.
 React 19.3.1, Vite 8.3.5, TypeScript 5.7.3 and React plugin 6.1.2 are pinned with a lockfile; Node 24 is the CI baseline. Installation used existing registry-cache contents because network access is denied. Native optional dependencies for Windows/Linux are represented in the lockfile.
@@ -13,7 +21,7 @@ Stable participant/team lock protocol; API/schema contracts; OIDC identity integ
 Scoring proposal: normalize missing desired-skill coverage and next-seven-day collaboration overlap to 0–100; weighted total 0.7/0.3; absent inputs score zero with explanation; stable ID tie-break. IANA zones handle daylight saving.
 Seed proposal: 2,000 teams with four members and 2,000 unteamed users.
 ## Unresolved
-Choose OIDC provider (managed service reduces password/security scope; local credentials add recovery and storage obligations).
+Identity provider: resolved for M1-B by the local email/password approval above; OIDC remains only a possible future migration.
 Choose hosting (managed JVM/PostgreSQL simplifies operations; container VM gives control but requires patching/backups). No vendor selected.
 Confirm invite reuse/rotation visibility, configuration changes after opening, scoring component formulas/windows, request lifecycle, idempotency failure retention, audit retention/access, administrator scope and profile visibility.
 Set numeric rate limits, availability/backup recovery targets, SSE connection limits, load environment and error budget before relevant implementation gates.

@@ -1,4 +1,8 @@
 # M1-A verification ledger
+
+## Gate recheck before M1-B — 2026-11-09
+Old blockers below are resolved. JDK 21.0.13.9 is installed at C:/Program Files/Eclipse Adoptium/jdk-21.0.13.9-hotspot. Root .env was read privately into the Maven child with that JAVA_HOME/PATH and TEAMFORGE_DATABASE_TESTS=true. Exact command: mvn --offline --batch-mode --no-transfer-progress '-Dmaven.repo.local=C:/Users/akhil/.m2/repository' -f backend/pom.xml verify. Exit 0; all five tests passed with no failures/errors/skips, Flyway V1 validated and executable-JAR packaging succeeded. No dependency change/network retry.
+Existing services returned HTTP 200 for GET http://localhost:8080/api/v1/health, http://localhost:8080/actuator/health/readiness and http://127.0.0.1:5173/api/v1/health. Existing processes were not stopped. This clears the required M1-A backend/proxy gate; later evidence is in verification-m1-b.md. Execution policy was not changed; the test child configured its own environment. No GitHub Actions result is claimed.
 Observed on 2026-11-09 in Windows PowerShell. These are local observations, not GitHub Actions results. The application acceptance gate is **partially blocked**. The original attempt below is historical; see the latest recovery results at the end.
 
 ## Environment and inspections

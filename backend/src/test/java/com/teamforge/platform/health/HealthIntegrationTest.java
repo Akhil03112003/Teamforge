@@ -11,10 +11,21 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.teamforge.platform.security.SecurityConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
+@ActiveProfiles("health-test")
+@SpringBootTest(classes = HealthIntegrationTest.HealthTestConfiguration.class,
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
     "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,"
         + "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,"
         + "org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration,"
@@ -22,6 +33,15 @@ import static org.assertj.core.api.Assertions.assertThat;
     "management.endpoint.health.group.readiness.include=readinessState"
 })
 class HealthIntegrationTest {
+    @Configuration(proxyBeanMethods = false)
+    @Profile("health-test")
+    @EnableAutoConfiguration
+    @Import({HealthController.class, SecurityConfiguration.class})
+    static class HealthTestConfiguration {
+        @Bean UserDetailsService noAccounts() {
+            return username -> { throw new UsernameNotFoundException("No accounts in health-only test."); };
+        }
+    }
     @LocalServerPort
     int port;
 

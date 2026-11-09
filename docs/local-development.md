@@ -15,7 +15,7 @@ Test-NetConnection localhost -Port 5432
 # Select the actual installed JDK 21. Adjust if installed elsewhere.
 $jdk21 = (Get-ChildItem 'C:/Program Files/Eclipse Adoptium' -Directory -Filter 'jdk-21*' | Sort-Object Name -Descending | Select-Object -First 1).FullName
 if (-not $jdk21) { throw 'Install/select JDK 21 before continuing.' }
-./scripts/Start-Backend.ps1 -JavaHome $jdk21 -Mode run
+./scripts/Start-Backend.ps1 -JavaHome $jdk21 -Mode run -LocalHttp
 ```
 
 Spring Boot does not automatically read the root .env. The dot-sourced script maps local Compose settings to DB_URL/DB_USERNAME/DB_PASSWORD without printing secrets or evaluating shell text. Maven commands use the installed Maven; no wrapper is included yet. If PowerShell policy blocks the local script, use a process-scoped policy only if permitted by your organization. Do not change machine policy. Start-Backend.ps1 loads the root .env itself in every fresh terminal, selects the passed JDK, requires Java 21, and invokes Maven. It never starts Docker. The loader validates required keys and port; .env uses unquoted KEY=value entries and supports equals signs inside values. Do not run it with tracing/transcription that would capture environment assignments.
@@ -47,7 +47,7 @@ Invoke-RestMethod http://127.0.0.1:5173/api/v1/health
 ```
 Without TEAMFORGE_DATABASE_TESTS=true, the database test class is skipped; the three HTTP health/security tests use a database-free Spring context. This is not evidence of migration success. Database-enabled tests boot the full application, check Flyway history/checksums and readiness, and reject invalid event bounds. Use a disposable local/test database.
 
-Health /api/v1/health reports process liveness only: {"status":"UP"}. Actuator readiness includes database health; public probe responses expose status only. The Actuator root additionally lists public liveness/readiness group names; components and connection details remain hidden. All other routes are denied; no authentication flow or generated development user is enabled. CSRF remains enabled. Secure session cookies remain configured; sign-in and local session development are M1-B concerns.
+Health /api/v1/health reports process liveness only: {"status":"UP"}. Actuator readiness includes database health; public probe responses expose status only. The Actuator root additionally lists public probe names; component/connection details remain hidden. M1-B now exposes registration/login/logout and own-profile endpoints; no generated development user. CSRF remains enabled. Cookies are Secure by default; -LocalHttp explicitly enables loopback HTTP development only. Omit it with HTTPS.
 
 Stop the TeamForge frontend/backend with Ctrl+C. Do not stop or reset an existing shared local PostgreSQL service. Only if using the optional Compose database, stop it with:
 ```powershell
@@ -96,3 +96,27 @@ Set-Location D:/HackerRank/PS1
 docker compose --env-file .env up -d --wait
 ```
 Never start a second database on an occupied port. Deployment and authentication provider selection remain outside M1-A.
+
+## M1-B authentication/profile workflow
+Local email/password is approved. After verify succeeds, restart the backend with -Mode run -LocalHttp; an already-running M1-A process lacks the new endpoints. Start Vite, then register a synthetic account, sign in, save profile, reload and sign out. Registration asks you to sign in. Client fetches fresh CSRF before each mutation; no credential/session storage in localStorage.
+TEAMFORGE_DATABASE_TESTS=true enables identity/profile HTTP tests. Flyway applies V2; tests clean up only returned fixture IDs. Never target production. JDK 21 and previously missing plugin artifacts are now installed/cached; the earlier blocked instructions are historical recovery guidance.
+If the editor compiles to target/, isolate verification to avoid IDE stubs overwriting classes:
+```powershell
+Set-Location D:/HackerRank/PS1
+. ./scripts/Set-DevelopmentEnvironment.ps1
+$env:JAVA_HOME = 'C:/Program Files/Eclipse Adoptium/jdk-21.0.13.9-hotspot'
+$env:PATH = "$env:JAVA_HOME/bin;$env:PATH"
+$env:TEAMFORGE_DATABASE_TESTS = 'true'
+mvn --batch-mode --no-transfer-progress '-Dteamforge.build.directory=D:/HackerRank/PS1/.tmp/backend-verify' -f backend/pom.xml clean verify
+```
+Adjust the installed JDK patch directory if needed. Default Maven/CI still uses target/. Codex additionally used offline mode and an ignored copy of the existing artifact cache; normal terminals need neither workaround unless encountering the same access problem.
+For isolated runtime checks when 8080/5173 are occupied:
+```powershell
+# Backend terminal after loading .env and selecting JDK 21 above:
+java -jar .tmp/backend-verify/teamforge-0.0.1-SNAPSHOT.jar --server.port=8081 --spring.profiles.active=local
+# Separate frontend terminal:
+Set-Location D:/HackerRank/PS1/frontend
+$env:BACKEND_ORIGIN = 'http://127.0.0.1:8081'
+npm.cmd run dev -- --port 5174
+```
+Every backend terminal loads .env itself. BACKEND_ORIGIN is only a development proxy setting. Do not enable the local cookie profile in deployment. No Docker is required with reachable local PostgreSQL.

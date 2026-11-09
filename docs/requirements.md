@@ -1,4 +1,6 @@
 # Requirements and acceptance
+
+M1-B traceability: REQ-11 now includes local registration/login/logout/restoration, session-derived private profiles, CSRF and bounded auth-IP throttling; REQ-17 includes participant forms only (team UI remains M7). Evidence: ParticipantIntegrationTest (28 API cases), HealthIntegrationTest (3 HTTP checks), DatabaseIntegrationTest (2 integration checks), AuthRateLimitFilterTest (1 unit check), frontend typecheck/build and local proxy flow. Actual outcomes: verification-m1-b.md. No future team requirement or remote CI result is claimed.
 Mandatory unless identified as approved default. Details: [product](product-spec.md), [API](api-contract.md), [tests](test-plan.md).
 
 - REQ-01: Configurable event minimum/maximum and incomplete status. Acceptance: demonstrate this behavior through API/integration assertions in test-plan.md; proposed mechanics remain subject to decisions.md.

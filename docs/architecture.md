@@ -1,4 +1,9 @@
 # Architecture
+
+## M1-B identity/profile slice
+identity owns accounts, local password authentication and principal loading; profiles owns private participant metadata and weekly availability. Registration joins both in one transaction. Controllers derive IDs from ParticipantPrincipal, never body/path identity. DTO validation bounds inputs and excludes credential fields. PostgreSQL unique email and profile FKs protect integrity; optimistic versioning rejects conflicting writes.
+Spring Security form login performs context persistence/session-ID rotation; logout invalidates the session. Browser fetches fresh session-backed CSRF before mutations and restores via GET /me. Default cookies remain Secure/HttpOnly/SameSite=Lax; local profile is opt-in for HTTP. Bounded single-instance auth-IP limiting records no passwords/email keys. Safe JSON errors expose no raw request values, SQL or stack traces.
+React retains the existing visual foundation with registration/login, restoration, profile editing and sign-out. No browser credential storage, new infrastructure or application dependency is introduced. The M1-A no-login/blocked-runtime descriptions below are historical; the gate was reverified on Java 21 before this slice.
 Approved: modular Java 21 Spring Boot monolith, Spring Security, PostgreSQL/Flyway, React/TypeScript/Vite, SSE. PostgreSQL is authoritative. No external broker/cache/distributed lock by default.
 
 ## M1-A foundation

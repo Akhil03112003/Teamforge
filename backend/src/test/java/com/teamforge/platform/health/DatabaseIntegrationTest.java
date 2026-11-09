@@ -27,7 +27,7 @@ class DatabaseIntegrationTest {
 
     @Test
     void migrationAndDatabaseReadinessAreHealthy() throws Exception {
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("1");
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("2");
         assertThat(flyway.validateWithResult().validationSuccessful).isTrue();
         var response = HttpClient.newHttpClient().send(HttpRequest.newBuilder(
             URI.create("http://localhost:" + port + "/actuator/health/readiness")).GET().build(),

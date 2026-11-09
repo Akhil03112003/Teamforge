@@ -1,4 +1,8 @@
 # Test plan
+
+## M1-B executed coverage
+Actual commands/results: [verification](verification-m1-b.md). ParticipantIntegrationTest covers 28 PostgreSQL/HTTP scenarios: account/profile creation and hash exclusion; HttpOnly CSRF session; normalized/concurrent duplicate identities; short/oversized UTF-8 passwords; invalid email/name; login/session rotation/restoration; wrong/unknown/oversized credentials; anonymous reads/updates; logout invalidation; profile round-trip/partial update; invalid zone/skills/windows/overlap; attempted identity injection; CSRF on registration/login/profile/logout; cross-session/stale pre-login tokens; malformed-body redaction. Maps to REQ-11 and participant portion of REQ-17.
+HealthIntegrationTest adds three database-free HTTP/security checks in an isolated configuration. DatabaseIntegrationTest adds two V2/readiness/bounds checks. AuthRateLimitFilterTest verifies throttle/Retry-After and health availability. GitHub Actions is configured to enable database tests; it has not run remotely. All 42 business cases below remain future plans; earlier no-tests-run wording is historical foundation status.
 Planned only; no results exist. JUnit 5 API tests against Testcontainers PostgreSQL with Flyway; run in GitHub Actions with Docker. Never use mocked persistence as concurrency evidence.
 
 M1-A foundation exception: five test methods are present under backend/src/test (three database-free HTTP health/security checks, two opt-in PostgreSQL/Flyway checks). They have not run locally because Maven downloads are blocked. The 42 business cases below remain planned. CI is defined, not executed; see [actual verification](verification-m1-a.md). Later concurrency tests still require real PostgreSQL/Testcontainers.

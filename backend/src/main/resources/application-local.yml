@@ -1,0 +1,6 @@
+# Opt-in local HTTP development only. Default application cookies remain Secure.
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false
