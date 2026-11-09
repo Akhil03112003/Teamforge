@@ -1,5 +1,5 @@
 # Proposed database design
-Not implemented. See [architecture](architecture.md) for lock protocol.
+The full design remains proposed. M1-A adds only the hackathons migration and JPA mapping; no other tables are implemented. Direct SQL was checked against isolated PostgreSQL; Flyway/application execution remains blocked. See [architecture](architecture.md) for lock protocol and [verification](verification-m1-a.md) for evidence.
 
 | Table | Relationships and constraints |
 |---|---|

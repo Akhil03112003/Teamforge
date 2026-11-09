@@ -1,6 +1,8 @@
 # Test plan
 Planned only; no results exist. JUnit 5 API tests against Testcontainers PostgreSQL with Flyway; run in GitHub Actions with Docker. Never use mocked persistence as concurrency evidence.
 
+M1-A foundation exception: five test methods are present under backend/src/test (three database-free HTTP health/security checks, two opt-in PostgreSQL/Flyway checks). They have not run locally because Maven downloads are blocked. The 42 business cases below remain planned. CI is defined, not executed; see [actual verification](verification-m1-a.md). Later concurrency tests still require real PostgreSQL/Testcontainers.
+
 - API-01: Create team and creator membership atomically.
 - API-02: Reject create by already-teamed user.
 - API-03: Allow memberships in different events.

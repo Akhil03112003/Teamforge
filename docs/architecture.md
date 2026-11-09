@@ -1,6 +1,11 @@
 # Architecture
 Approved: modular Java 21 Spring Boot monolith, Spring Security, PostgreSQL/Flyway, React/TypeScript/Vite, SSE. PostgreSQL is authoritative. No external broker/cache/distributed lock by default.
 
+## M1-A foundation
+backend/ targets Java 21 with Maven/Spring Boot 3.5.16. platform.health and platform.security contain infrastructure; events.persistence maps only hackathons. JPA validates rather than generates schema; Flyway applies V1 at startup. DB_URL/DB_USERNAME/DB_PASSWORD are required environment variables without credential defaults.
+frontend/ uses React/TypeScript/Vite with a typed, runtime-validated health client, timeout, cancellation and retry. Development /api proxies to backend port 8080; no wildcard CORS. Compose binds PostgreSQL only to localhost. CI is defined but has not run.
+Security retains CSRF and secure session cookies, excludes the generated default user, exposes only GET health endpoints and denies other requests. No login or identity integration exists. This does not implement the later authentication requirement.
+
 Proposed modules: identity, events/profiles, teams/membership, suggestions, audit/live delivery. Controllers validate DTOs; services own transactions; repositories enforce database access.
 
 ## Transaction and lock protocol (proposed)

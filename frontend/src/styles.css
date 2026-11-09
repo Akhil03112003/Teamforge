@@ -1,0 +1,31 @@
+:root { font-family: "Segoe UI", sans-serif; color: #1c3029; background: #f5f4ee; font-synthesis: none; line-height: 1.6; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: inherit; text-underline-offset: .25em; }
+::selection { background: #d4e2ac; color: #1c3029; }
+:focus-visible { outline: 3px solid #366b50; outline-offset: 5px; }
+header, main, footer { width: min(1120px, calc(100% - 48px)); margin-inline: auto; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-block: 28px; border-bottom: 1px solid #b9c1b7; }
+.wordmark { font-size: 1.5rem; font-weight: 750; text-decoration: none; letter-spacing: -.03em; }
+.wordmark span { color: #52734b; }
+.phase, .scope, .note, footer { color: #4a5c50; }
+.phase { font-size: .875rem; text-align: right; }
+main { display: grid; grid-template-columns: 1.5fr 1fr; align-items: end; gap: 72px; padding-block: 72px 88px; min-height: 70vh; }
+h1 { font-family: Georgia, serif; font-size: clamp(2.8rem, 6vw, 5.5rem); line-height: 1.04; font-weight: 400; letter-spacing: -.035em; margin: 0 0 28px; }
+h1 em { color: #366b50; }
+.intro { font-size: 1.25rem; max-width: 40ch; }
+.scope { max-width: 48ch; }
+h2 { font-size: 1.25rem; margin: 0 0 20px; }
+.connection { padding-block: 24px; border-top: 1px solid #b9c1b7; }
+.connection [role="status"] { min-height: 3.2em; }
+.indicator { display: inline-block; width: 10px; height: 10px; margin-right: 10px; border-radius: 50%; background: #6c6d5d; }
+.indicator.connected { background: #366b50; }
+.indicator.unavailable { background: #a14d31; }
+button { border: 0; border-radius: 6px; background: #1c3029; color: #fff; font: inherit; font-weight: 600; padding: 12px 22px; min-height: 48px; cursor: pointer; }
+button:hover:not(:disabled) { background: #366b50; }
+button:disabled { background: #5d6d62; cursor: wait; }
+.note { font-size: .875rem; max-width: 45ch; margin-top: 20px; }
+footer { padding-block: 24px; border-top: 1px solid #b9c1b7; display: flex; justify-content: space-between; gap: 20px; font-size: .875rem; }
+.skip-link { position: absolute; top: -100px; left: 16px; padding: 12px; background: #fff; z-index: 1; }
+.skip-link:focus { top: 12px; }
+@media (max-width: 720px) { main { grid-template-columns: 1fr; gap: 40px; padding-block: 48px; } footer { flex-direction: column; gap: 4px; } }

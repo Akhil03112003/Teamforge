@@ -1,4 +1,11 @@
 # Decisions
+
+## M1-A implementation record — 2026-11-09
+The user authorized foundation only. Selected Java release 21, Maven and stable Spring Boot 3.5.16 (official compatibility: https://docs.spring.io/spring-boot/3.5/system-requirements.html). Local Java is 24; Java 21 runtime checks remain outstanding. Do not downgrade to old cached backend dependencies merely to obtain a local build.
+React 19.3.1, Vite 8.3.5, TypeScript 5.7.3 and React plugin 6.1.2 are pinned with a lockfile; Node 24 is the CI baseline. Installation used existing registry-cache contents because network access is denied. Native optional dependencies for Windows/Linux are represented in the lockfile.
+Only hackathons is migrated/mapped: it is identity-provider-independent and already justified by the data design. SQL checks used native PostgreSQL 18.6; Compose/CI target PostgreSQL 17.7. This fallback is not evidence for the pinned environment or Flyway.
+Spring Security denies non-health traffic and retains CSRF; no generated development credentials or authentication flows. Public liveness is separate from database readiness and exposes no details. Vite proxy avoids a premature CORS policy. CI uses an ephemeral PostgreSQL container and generated password with database-enabled integration tests; Testcontainers race testing remains later work.
+No core business rules or transaction architecture changed. Identity provider and deployment provider remain open; free-tier suitability is unverified. M1-A backend build/runtime and Flyway verification remain blocked by dependency downloads. M1-B is not authorized.
 ## Approved
 Stack and modular monolith as recorded in [problem statement](problem-statement.md). PostgreSQL transactions/constraints, persisted idempotency, SSE reconnect/refetch. Product defaults in that document are approved. Leader-only removal is required by latest source, superseding the earlier exclusion proposal.
 ## Proposed, awaiting review

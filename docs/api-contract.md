@@ -2,6 +2,8 @@
 Base /api/v1. JSON; approved Spring Security server-managed sessions; identity provider unresolved. Secure, HttpOnly session cookies and CSRF protection are required for mutations. Never trust client actor/role values.
 IDs are opaque strings; timestamps UTC ISO-8601. Error shape: {code,message,requestId,fieldErrors?}; never expose SQL or invite secrets.
 
+M1-A adds public GET /api/v1/health: 200 {"status":"UP"} for process liveness, plus status-only Actuator health/liveness/readiness (readiness includes PostgreSQL). These responses do not use the proposed business error envelope. Backend runtime verification is blocked; these are implemented source contracts, not observed endpoint results. Business endpoints below remain unimplemented and access is denied; authentication flows wait for M1-B.
+
 | Operation ID | Endpoint | Input / result |
 |---|---|---|
 | BOARD | GET /hackathons/{event}/teams | cursor, limit<=50, skill, openSeats; {items,nextCursor} |
