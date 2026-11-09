@@ -1,5 +1,16 @@
 # Test plan
 
+## M4 implemented test coverage
+AdmissionWorkflowsIntegrationTest covers REQ-03/04/08/09/11/12 and request portions of REQ-17 using real PostgreSQL and public HTTP/security adapters. Exact execution counts/timings are in [verification-m4.md](verification-m4.md); earlier planned-only statements below are historical.
+
+- API-07/08/09/41: public valid join; expired/rotated/unknown/malformed uniform errors;32 random bytes encoded43 characters;64-hex hash persistence; database24h timestamps; rotation races/rollback and current-leader permission.
+- API-10/11/12/13/24/25/26: duplicate/multiple pending requests; applicant-only withdrawal; leader-only decisions/inbox; full acceptance stays pending; terminal transition constraint; cleanup on create/invite/approval; competing withdrawal/departure/deletion/approval and other-team cleanup.
+- API-19:50 distinct real users/sessions with CSRF and distinct keys start public invite redemption together behind a bounded barrier. Assert one201,49 TEAM_FULL409, exact maximum roster, one admission audit and49 users without membership. M3's separate50-held-connection/PID tests remain unchanged. Mixed public invite/approval final-seat competition is also asserted. HTTP operations create independent root transactions on the server; client threads do not share a transaction.
+- API-20/21/22/23/28/40: concurrent same-key redemption/approval; stored replay after rotation/removal/deletion; payload mismatch; rollback of both key scopes/membership/request/audit; real unread-socket committed response loss and replay for both redemption and acceptance. Nested-root lock-timeout recovery is tested against a real blocker.
+- API-30/31/33/38: session/CSRF, private inbox, applicant audit denial, cross-event membership independence, rate limiting at actual public endpoint (separate class with low test threshold), bounded request pagination.
+
+Race logs separate successful HTTP statuses from completed calls and report elapsed time, deadlocks and lock timeouts. Fault-injected recovery is logged separately. Integration fixtures are removed by exact owned IDs; immutable audit remains. No mocked persistence/locking, test admission endpoint or disabled production authorization. Frontend typecheck/build and existing88 baseline tests must pass. Docker/Testcontainers, CI, visual browser review and large load gates must not be claimed without execution.
+
 ## M3 executed coverage (current)
 See [verification-m3.md](verification-m3.md) for exact results. The 61-test M2 baseline was run before changes and remains covered in the final 88-test run. MembershipConcurrencyIntegrationTest contributes 27 executed cases, including three repetitions of the 50-user race. Tests use native real PostgreSQL because the Docker daemon is inaccessible; CI/Testcontainers execution is not claimed.
 

@@ -45,9 +45,11 @@ public class MutationTransactions {
             } catch (RuntimeException error) {
                 String state=sqlState(error);
                 if (RETRYABLE.contains(state)) {
+                    // Preserve SQLSTATE for an outer root runner; never retry a joined fragment.
+                    if (joined) throw error;
                     meters.counter("teamforge.mutations.database.conflicts","sqlstate",state).increment();
                     // Do not retry a fragment of a caller-owned transaction.
-                    if (!joined && attempt<attempts) {
+                    if (attempt<attempts) {
                         meters.counter("teamforge.mutations.retries","sqlstate",state).increment();
                         continue;
                     }

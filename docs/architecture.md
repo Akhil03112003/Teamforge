@@ -1,5 +1,18 @@
 # Architecture
 
+## M4 implemented workflow adapters (current)
+AdmissionWorkflows exposes authenticated invitation/request operations through AdmissionController; both successful entry workflows call MembershipAdmissionService. The only roster insertion primitive remains shared with creation. There is no independent invitation/request membership writer.
+
+JOIN and ACCEPT first claim their caller-scoped outer idempotency key, then the shared admission key; both keys are acquired before domain locks, in a fixed outer-to-inner order. These operations use distinct inner scopes (INVITE_ADMIT/REQUEST_ADMIT), preventing cross-workflow collisions. READ COMMITTED locator reads identify team/applicant only. Next: ensure/lock applicant anchor FOR NO KEY UPDATE, lock destination team FOR UPDATE, then lock/validate invitation or request. Invitation authority requires actor==target and valid nonrevoked database-time expiry; RequestApproval requires the locked team's current leader and matching pending applicant request. Append rechecks event exclusivity and capacity. RequestResolution accepts the source and closes other event-pending requests while still holding the applicant anchor. Creation also closes pending requests.
+
+Request creation, withdrawal and decline follow applicant anchor → team → subordinate records. Request creation on full teams is allowed; failed full acceptance keeps PENDING. Duplicate pending creation returns the existing record. Terminal requests cannot transition again. Cross-team pending cleanup touches only request rows and audit snapshots, in ordered request IDs; it does not lock other teams or acquire another applicant anchor. Competing decisions for one applicant serialize at the anchor. Other-team deletion may wait on request rows but cleanup never waits on that team's lock, avoiding a cycle. All transitions/audit/outcomes roll back together.
+
+Rotation needs only team → invitation locks. Redemption uses applicant → same team → invitation, so rotation cannot invert subordinate/team order. Team deletion cascades active invitations/requests while preserving audit/idempotency. Team leave/removal/succession already use the same team lock; old leader authorization becomes invalid after transfer commits. Replay is a historical response retrieval for the original caller, not a new authority decision.
+
+Nested transaction runners now propagate retryable SQL exceptions to the owning root runner instead of converting them prematurely. Only the root retries the entire outer-key + inner-key + domain transaction after rollback; counters are recorded once at that root. Existing bounds and unknown-outcome behavior remain. A real nested-redemption timeout test checks recovery. No retry of partial fragments or extra infrastructure is introduced.
+
+Redemption has a bounded account/IP security filter after authentication/authorization, with CSRF still active. SecureRandom256-bit codes are hashed before persistence/fingerprinting. Plaintext is returned once and retained only in ephemeral UI state; no retrieval/storage/logging/audit path. Audit history permission now requires membership evidence, so merely submitting/deciding a request does not grant access to the team's full history. SSE and suggestions remain unimplemented.
+
 ## M3 implemented admission and idempotency (current)
 This section supersedes M2's deferred-idempotency statements below. See [verification](verification-m3.md), [database](database-design.md) and [contract](api-contract.md).
 

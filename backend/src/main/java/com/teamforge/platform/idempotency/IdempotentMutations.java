@@ -21,6 +21,11 @@ public class IdempotentMutations {
     }
     public <T> T execute(UUID actor, String operation, String key, Object payload,
                          Class<T> responseType, Supplier<T> mutation) {
+        return execute(actor,operation,key,payload,responseType,201,mutation);
+    }
+    public <T> T execute(UUID actor, String operation, String key, Object payload,
+                         Class<T> responseType, int responseStatus, Supplier<T> mutation) {
+        if (responseStatus<200 || responseStatus>299) throw new IllegalArgumentException("Only successful outcomes are persisted.");
         if (actor==null || key==null || !key.matches("[A-Za-z0-9][A-Za-z0-9._:-]{0,127}"))
             throw new ApiException(400,"INVALID_IDEMPOTENCY_KEY","Supply an Idempotency-Key of 1–128 safe ASCII characters.");
         String hash=fingerprint(payload);
@@ -40,10 +45,10 @@ public class IdempotentMutations {
                 throw new ApiException(409,"IDEMPOTENCY_IN_PROGRESS","This key is still in progress. Retry the same request later.");
             T result=mutation.get();
             jdbc.update("""
-                UPDATE idempotency_records SET state='COMPLETED',response_status=201,
+                UPDATE idempotency_records SET state='COMPLETED',response_status=?,
                     response_body=?::jsonb,completed_at=clock_timestamp()
                 WHERE actor_id=? AND operation=? AND idempotency_key=?
-                """,json(result),actor,operation,key);
+                """,responseStatus,json(result),actor,operation,key);
             return result;
         });
     }

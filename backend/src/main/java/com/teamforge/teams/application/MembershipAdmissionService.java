@@ -8,6 +8,8 @@ import java.util.*;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.jdbc.core.JdbcTemplate;
+import com.teamforge.teams.persistence.RequestResolution;
 
 @Service
 public class MembershipAdmissionService {
@@ -18,12 +20,21 @@ public class MembershipAdmissionService {
     private record Fingerprint(int version, UUID teamId, UUID participantId, String authorityKind, AdmissionAuthorization authorization) {}
     private final TeamStore store;
     private final IdempotentMutations mutations;
-    public MembershipAdmissionService(TeamStore store,IdempotentMutations mutations) { this.store=store;this.mutations=mutations; }
+    private final JdbcTemplate jdbc;
+    private final RequestResolution requests;
+    public MembershipAdmissionService(TeamStore store,IdempotentMutations mutations,JdbcTemplate jdbc,RequestResolution requests) {
+        this.store=store;this.mutations=mutations;this.jdbc=jdbc;this.requests=requests;
+    }
     public Result admit(Command command) {
         if (command==null || command.teamId()==null || command.participantId()==null
             || command.actorId()==null || command.authorization()==null)
             throw new ApiException(400,"INVALID_ADMISSION","Supply a trusted, complete admission command.");
-        return mutations.execute(command.actorId(),"MEMBERSHIP_ADMIT",command.idempotencyKey(),
+        String operation=switch(command.authorization()) {
+            case AdmissionAuthorization.Invitation ignored -> "INVITE_ADMIT";
+            case AdmissionAuthorization.RequestApproval ignored -> "REQUEST_ADMIT";
+            default -> "MEMBERSHIP_ADMIT";
+        };
+        return mutations.execute(command.actorId(),operation,command.idempotencyKey(),
             new Fingerprint(1,command.teamId(),command.participantId(),command.authorization().kind(),command.authorization()),
             Result.class,() -> {
                 var locator=store.find(command.teamId(),false);
@@ -32,9 +43,11 @@ public class MembershipAdmissionService {
                 store.ensureParticipant(locator.eventId(),command.participantId());
                 store.lockParticipant(locator.eventId(),command.participantId());
                 var team=store.find(command.teamId(),true);
-                command.authorization().verify(team,command.actorId());
+                command.authorization().verify(team,command.actorId(),command.participantId(),jdbc);
                 UUID membership=append(team,command.participantId());
                 store.audit(team,command.actorId(),"MEMBER_ADMITTED","USER",command.participantId());
+                requests.joined(team.eventId(),command.participantId(),command.actorId(),
+                    command.authorization() instanceof AdmissionAuthorization.RequestApproval approval ? approval.requestId():null);
                 return new Result(team.id(),team.eventId(),command.participantId(),membership,store.memberCount(team.id()));
             });
     }
@@ -44,6 +57,7 @@ public class MembershipAdmissionService {
             || !team.leaderId().equals(actor) || store.memberCount(team.id())!=0)
             throw new IllegalStateException("Creator admission requires a new owned team transaction.");
         append(team,actor);
+        requests.joined(team.eventId(),actor,actor,null);
     }
     private UUID append(Row team,UUID participant) {
         if (store.membership(team.eventId(),participant).isPresent())

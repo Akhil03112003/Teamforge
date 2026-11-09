@@ -1,5 +1,14 @@
 # Progress
 
+## Current status — M4 review handoff
+M0–M4 implemented; M4 automated gates passed. Stop before M5. Historical handoffs below are superseded by this section. M5–M9 not started.
+- Initial Git clean; original88-test M3 baseline rerun passed. Final Java21 Maven clean verify:133 tests, zero failures/errors/skips, BUILD SUCCESS/executable packaging,3m48s. New M4 coverage:44 workflow cases plus1 real rate-limit case; all original88 remain green.
+- Public50-way authenticated invitation race:1 HTTP201,49 TEAM_FULL409, roster at maximum2, no loser memberships, one admission audit;277ms and no deadlocks/timeouts. Mixed public invitation/approval race likewise admits exactly one. Other cleanup/rotation/withdrawal/leadership/deletion/retry races passed. Separate fault test proves nested whole-workflow retry after a real lock timeout. Retained M3 independent50-connection tests also passed.
+- V5 applied/validated on existing local PostgreSQL; V1–V4 unchanged. Invitations hash-only/256-bit/database24h expiry/rotation; legal request transitions/current-leader decisions; shared admission and atomic persisted replay/cleanup/audit; actual HTTP lost-response recovery for redemption and acceptance.
+- Frontend request/invitation controls, statuses/withdrawal/paginated inbox and typed key/CSRF patterns implemented. Final typecheck/build passed (21 modules,182ms). No runtime visual/keyboard result claimed.
+- Native PostgreSQL18.6 emits the known Flyway tested-version warning. Docker reprobe denied daemon access. PostgreSQL17.7/Testcontainers, remote GitHub Actions, large seed/load tests and deployment remain unexecuted. Hosting selection remains open.
+- No dependencies installed, resets, commits/pushes, SSE, suggestions or M5 work. See [verification and file inventory](verification-m4.md), [decisions](decisions.md), [API](api-contract.md), [architecture](architecture.md).
+
 ## Current status — M3 review handoff
 M0–M3 implemented; M3 automated gates passed. Stop before M4. Historical handoffs below are superseded by this section. Browser visual/keyboard runtime review, remote CI and deployment remain unverified.
 - Reverified the original 61-test baseline before changes. Final Java21 Maven clean verify: 88 tests, zero failures/errors/skips; executable packaging successful, 2m52s. New concurrency/recovery class: 27 cases, 33.135s.

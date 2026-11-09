@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
+import AdmissionPanel from './AdmissionPanel';
 import { ApiError, createTeam, getTeam, leaveTeam, listHackathons, listTeams, myTeam, removeTeamMember, teamAudit, updateTeam,
   type AuditEvent, type Hackathon, type Participant, type Team, type TeamInput, type TeamSummary } from '../api/client';
 
@@ -97,7 +98,7 @@ export default function TeamDashboard({ user, onSessionExpired }: { user: Partic
   }
   return <section aria-labelledby="dashboard-heading">
     <h1 id="dashboard-heading" className="profile-title">Your hackathon teams</h1>
-    <p>Create a team, keep its details current and manage its roster. Invitations and joining arrive in a later milestone.</p>
+    <p>Create a team, request a place or redeem an invitation. Leaders manage invitations and requests.</p>
     {error && <div role="alert" className="error-summary" tabIndex={-1} ref={summary}><p>{error}</p><button className="secondary" type="button" onClick={() => { setError(''); if (eventId) setRevision(value => value + 1); else window.location.reload(); }}>Refresh dashboard</button></div>}
     <p role="status" aria-live="polite">{notice}</p>
     <div className="dashboard-toolbar"><div className="field"><label htmlFor="hackathon">Hackathon</label>
@@ -129,7 +130,6 @@ export default function TeamDashboard({ user, onSessionExpired }: { user: Partic
             <button className="secondary" type="button" disabled={busy} onClick={() => setConfirmation(null)}>Cancel</button>
           </div>}
           {isLeader && <TeamForm key={selected.id} initial={selected} busy={busy} submit={input => { void act(async () => { await updateTeam(selected.id, input); setNotice('Team details saved.'); setRevision(value => value + 1); }); }} />}
-          {!isMember && <p className="note">You can view this roster. Joining is not available in this milestone.</p>}
         </section>}
       </div><section className="team-board" aria-labelledby="board-heading"><h2 id="board-heading">Teams in this hackathon</h2>
         {!board.length && <p>No teams yet.</p>}<ul>{board.map(team => <li key={team.id}><button type="button" className="team-select" disabled={busy} onClick={() => { void select(team.id); }} aria-pressed={selected?.id === team.id}>
@@ -137,6 +137,7 @@ export default function TeamDashboard({ user, onSessionExpired }: { user: Partic
         </button></li>)}</ul>
         {cursor && <button className="secondary" type="button" disabled={busy} onClick={() => { void act(async () => { const page = await listTeams(eventId, cursor); setBoard(current => [...current, ...page.items.filter(item => !current.some(old => old.id === item.id))]); setCursor(page.nextCursor); }); }}>Load more teams</button>}
       </section></div>
+      <AdmissionPanel key={eventId + ':' + (selected?.id ?? '')} event={eventId} selected={selected} userId={user.id} teamed={!!own} refresh={() => setRevision(value => value + 1)} expired={onSessionExpired} />
     </>}
     {history && <section className="team-history" aria-labelledby="history-heading"><h2 id="history-heading">Team audit history</h2><p className="note">Only current and former participants can read this history. Identifiers remain after team deletion.</p>
       <ol>{history.items.map(item => <li key={item.id}><time dateTime={item.timestamp}>{new Date(item.timestamp).toLocaleString()}</time> · {item.action.toLowerCase().replaceAll('_', ' ')} · actor {item.actorId === user.id ? 'you' : item.actorId.slice(0, 8)} · target {item.targetType === 'TEAM' ? 'team' : item.targetId.slice(0, 8)}</li>)}</ol>

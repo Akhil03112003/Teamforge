@@ -21,7 +21,8 @@ public class SecurityConfiguration {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper mapper,
-        @Value("${teamforge.security.auth-attempts-per-minute:30}") int attemptsPerMinute) throws Exception {
+        @Value("${teamforge.security.auth-attempts-per-minute:30}") int attemptsPerMinute,
+        @Value("${teamforge.security.invite-attempts-per-minute:60}") int inviteAttempts) throws Exception {
         return http
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.GET, "/api/v1/health", "/actuator/health",
@@ -33,6 +34,9 @@ public class SecurityConfiguration {
                     "/api/v1/hackathons/*/me/team", "/api/v1/teams/*",
                     "/api/v1/teams/*/members", "/api/v1/teams/*/members/*",
                     "/api/v1/teams/*/audit-events").authenticated()
+                .requestMatchers("/api/v1/hackathons/*/invite-joins", "/api/v1/hackathons/*/me/requests",
+                    "/api/v1/teams/*/invite", "/api/v1/teams/*/requests", "/api/v1/teams/*/requests/*",
+                    "/api/v1/teams/*/requests/*/accept", "/api/v1/teams/*/requests/*/decline").authenticated()
                 .anyRequest().denyAll())
             .requestCache(cache -> cache.disable())
             .sessionManagement(session -> session.sessionFixation(fixation -> fixation.changeSessionId()))
@@ -45,6 +49,8 @@ public class SecurityConfiguration {
                 .logoutSuccessHandler((request, response, authentication) -> response.setStatus(204)))
             .addFilterBefore(new AuthRateLimitFilter(mapper, Clock.systemUTC(), attemptsPerMinute),
                 UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(new InviteRateLimitFilter(mapper,inviteAttempts),
+                org.springframework.security.web.access.intercept.AuthorizationFilter.class)
             // Session-backed CSRF remains enabled, including registration/login/logout.
             .exceptionHandling(errors -> errors
                 .authenticationEntryPoint((request, response, error) -> ApiErrors.write(response, mapper,

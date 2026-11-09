@@ -1,5 +1,5 @@
 # Implementation plan
-M0–M3 automated implementation gates are complete; see verification-m3.md for evidence and limitations. M4 and later work require separate authorization. Each milestone updates progress, records material decisions and reports actual checks/failures.
+M4 invitation/request automated gates passed; see verification-m4.md for actual evidence and limitations. M5 and later work require separate authorization. Each milestone updates progress, records material decisions and reports actual checks/failures.
 
 | Milestone | Dependency | Acceptance gate |
 |---|---|---|
@@ -19,4 +19,4 @@ M0–M3 automated implementation gates are complete; see verification-m3.md for 
 Priority: concurrency correctness first, defensible decisions second, quality/tests/UX third. No gate may substitute planned checks for observed results.
 
 
-The latest scope places identity/profiles in M1-B and lifecycle/removal in M2. M3 covers explicitly requested concurrency/idempotency acceptance; later admission scope still requires authorization. M8 validates rate limits, large seed constraints and strict LOAD-01. M9 requires verified hosting/free-tier constraints, DEPLOY-01 and SUBMIT-01. M3 completion does not authorize M4.
+The latest scope places identity/profiles in M1-B and lifecycle/removal in M2. M3 covers explicitly requested concurrency/idempotency acceptance; later admission scope still requires authorization. M8 validates rate limits, large seed constraints and strict LOAD-01. M9 requires verified hosting/free-tier constraints, DEPLOY-01 and SUBMIT-01. M4 completion does not authorize M5.

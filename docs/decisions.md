@@ -1,5 +1,16 @@
 # Decisions
 
+## M4 implementation record — 2026-11-09
+User authorized invitations/join requests and their public concurrency proof. Initial Git tree clean; the88-test M3 baseline was rerun successfully before M4 verification. V5 is additive; V1–V4 unchanged. No dependencies/new infrastructure, resets, commits or pushes.
+
+Implementation choices within approved rules: reusable32-byte SecureRandom invitation codes, SHA-256-only persistence, database24h expiry, one unrevoked generation/team and rotation under team lock. Plaintext is never persisted, including in idempotency records. Generation is deliberately unkeyed because plaintext is shown only once; lost issuance requires explicit rotation. Public redemption is keyed and calls shared admission with validated Invitation authority. Acceptance is keyed and uses RequestApproval; it retains the documented200 id/state response and adds membership details. IdempotentMutations now records the caller-specified success status (existing default201 unchanged).
+
+PENDING transitions only to ACCEPTED/DECLINED/WITHDRAWN/CLOSED. Full acceptance leaves pending; duplicate pending creation returns existing intent without duplicate audit; new requests after resolution are allowed if eligible. Entry through create/invite/approval resolves other event-pending requests. Cleanup takes ordered subordinate rows under the applicant anchor without locking other teams; rotation takes team before invitations. Nested retryable SQL errors reach the root runner so whole-workflow retry remains possible. No business admission bypass is introduced.
+
+Listing uses bounded100-item UUID cursor pages; UI supports loading more. Invitation attempt limit default60/account/min and600/direct-IP/min, bounded20000 tracked keys, configurable account threshold. This is single-instance and must be reviewed for hosting replicas/trusted proxies during hardening. Audit authorization is restricted to actual membership evidence; request actions alone do not grant full team-history access.
+
+These choices resolve earlier proposed invite reuse, request transitions/cleanup and admission rate defaults for M4. Existing indefinite idempotency retention remains; no token recovery or silent key expiration. Hosting/free-tier verification, operational retention, scoring, SSE and remaining delivery gates stay open. Final Java21 clean verify passed133 tests (45 new M4), zero failures/errors/skips; frontend checks passed. Public50-way invitation race produced1 success/49 capacity conflicts with no ordinary database deadlocks/timeouts. Actual verification/limitations: [verification-m4.md](verification-m4.md). Stop before M5.
+
 ## M3 implementation record — 2026-11-09
 The user authorized shared admission, persisted create/admission idempotency and actual PostgreSQL races, without M4 workflows. Baseline 61 tests passed before changes. This section supersedes M2 statements that keys are not required or replay is deferred.
 

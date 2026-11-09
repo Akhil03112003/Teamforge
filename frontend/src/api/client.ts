@@ -142,6 +142,35 @@ export async function teamAudit(id: string, offset = 0): Promise<AuditEvent[]> {
   });
 }
 
+export interface JoinRequest { id: string; teamId: string; applicantId: string; displayName: string; state: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'WITHDRAWN' | 'CLOSED'; createdAt: string }
+function joinRequest(value: unknown): JoinRequest {
+  const row = object(value); const state = text(row.state);
+  if (!['PENDING', 'ACCEPTED', 'DECLINED', 'WITHDRAWN', 'CLOSED'].includes(state)) throw new ApiError('Unexpected request state. Refresh and try again.');
+  return { id: text(row.id), teamId: text(row.teamId), applicantId: text(row.applicantId), displayName: text(row.displayName), state: state as JoinRequest['state'], createdAt: text(row.createdAt) };
+}
+export async function rotateInvitation(team: string): Promise<{ code: string; expiresAt: string }> {
+  const row = object(await mutate('/teams/' + encodeURIComponent(team) + '/invite'));
+  return { code: text(row.code), expiresAt: text(row.expiresAt) };
+}
+export async function redeemInvitation(event: string, code: string, key: string): Promise<void> {
+  await mutate('/hackathons/' + encodeURIComponent(event) + '/invite-joins', JSON.stringify({ code }), 'application/json', 'POST', key);
+}
+export async function requestTeam(team: string): Promise<JoinRequest> { return joinRequest(await mutate('/teams/' + encodeURIComponent(team) + '/requests')); }
+export interface RequestPage { items: JoinRequest[]; nextCursor: string | null }
+function requestPage(value: unknown): RequestPage {
+  const row = object(value); return { items: list(row.items).map(joinRequest), nextCursor: row.nextCursor === null ? null : text(row.nextCursor) };
+}
+export async function myRequests(event: string, cursor?: string): Promise<RequestPage> {
+  return requestPage(await request('/hackathons/' + encodeURIComponent(event) + '/me/requests' + (cursor ? '?cursor=' + encodeURIComponent(cursor) : '')));
+}
+export async function requestInbox(team: string, cursor?: string): Promise<RequestPage> {
+  return requestPage(await request('/teams/' + encodeURIComponent(team) + '/requests' + (cursor ? '?cursor=' + encodeURIComponent(cursor) : '')));
+}
+export async function withdrawRequest(row: JoinRequest): Promise<void> { await mutate('/teams/' + encodeURIComponent(row.teamId) + '/requests/' + encodeURIComponent(row.id), undefined, 'application/json', 'DELETE'); }
+export async function decideRequest(row: JoinRequest, accept: boolean, key?: string): Promise<void> {
+  await mutate('/teams/' + encodeURIComponent(row.teamId) + '/requests/' + encodeURIComponent(row.id) + (accept ? '/accept' : '/decline'), undefined, 'application/json', 'POST', key);
+}
+
 export async function getHealth(signal?: AbortSignal): Promise<HealthResponse> {
   const response = await fetch('/api/v1/health', {
     signal,

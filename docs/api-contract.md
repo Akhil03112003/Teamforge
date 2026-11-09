@@ -1,5 +1,29 @@
 # API contract
 
+## M4 invitation/request contracts (current)
+This section supersedes M3's lack of public admission routes. All endpoints below require a server-managed authenticated session; mutations require fresh session CSRF. Actor, leader and applicant identities are derived server-side. Unknown JSON fields are rejected. Existing team/auth/profile contracts remain available.
+
+| Operation | Endpoint (prefix /api/v1) | Request / response |
+|---|---|---|
+| INVITE | POST /teams/{team}/invite | No body; current leader only; 201 {code,expiresAt}. Always generates/rotates; plaintext shown only in this response. |
+| JOIN | POST /hackathons/{event}/invite-joins | JSON {code}, required Idempotency-Key; 201 {teamId,hackathonId,participantId,membershipId,memberCount}. |
+| REQUEST | POST /teams/{team}/requests | No body; caller is applicant; 201 request. Repeated pending intent returns existing request without a second audit. |
+| MY-REQUESTS | GET /hackathons/{event}/me/requests?cursor={uuid} | Own requests including terminal states; {items,nextCursor}, up to100 ordered by UUID. |
+| INBOX | GET /teams/{team}/requests?cursor={uuid} | Current leader only; pending requests, {items,nextCursor}, up to100 ordered by UUID. |
+| WITHDRAW | DELETE /teams/{team}/requests/{request} | Applicant only, pending only; 204. |
+| ACCEPT | POST /teams/{team}/requests/{request}/accept | Current leader, pending only, required Idempotency-Key; 200 {id,state:"ACCEPTED",membership:{teamId,hackathonId,participantId,membershipId,memberCount}}. |
+| DECLINE | POST /teams/{team}/requests/{request}/decline | Current leader, pending only; 200 request with state DECLINED. |
+
+Request shape: {id,teamId,applicantId,displayName,state,createdAt}; only display name and opaque identity are exposed, not email/credentials/private profile fields. nextCursor is null at the end. Request histories disappear with the active team; immutable audit and successful keyed outcomes survive.
+
+Invitation codes encode 32 cryptographically random bytes as43 URL-safe characters; only SHA-256 hash persists. Expiry is database generation time +24h; comparison uses database time inside the locked admission transaction. Reusable codes work until expiry/rotation/deletion, subject to membership/capacity. No code lookup/recovery endpoint exists. Generating again revokes the previous code; after a lost issuance response the leader must deliberately rotate again. Invitations never appear in audit, URLs, request outcomes, logs or future SSE payloads.
+
+JOIN scopes keys to INVITE_REDEEM; fingerprints contain event and token hash. ACCEPT scopes keys to REQUEST_ACCEPT with team/request IDs. Each wraps the shared admission operation in the same transaction; inner INVITE_ADMIT/REQUEST_ADMIT scopes cannot collide with each other or the original MEMBERSHIP_ADMIT operation. The recorded outer status/body (201 JOIN,200 ACCEPT) replays even after expiry/rotation/deletion/leadership change, without another effect. Sessions/CSRF are required for replay; fresh operations recheck current authority. Same-key/different-content reuse returns409 IDEMPOTENCY_KEY_REUSED. Failed full/invalid/stale work rolls back both key records and leaves pending requests unchanged. Retention and transient recovery follow M3.
+
+Invalid, expired, rotated, wrong-event or deleted-team invitation codes uniformly return400 INVALID_INVITE with no distinction. Oversized/malformed codes share this error; malformed JSON/unknown fields remain400 validation errors. Capacity409 TEAM_FULL; existing event membership409 ALREADY_TEAMED; stale/nonpending request409 REQUEST_RESOLVED; unavailable request404 REQUEST_NOT_FOUND; nonleader403 LEADER_REQUIRED; wrong withdrawing applicant403 FORBIDDEN. A full acceptance leaves PENDING. Success atomically accepts its source request (if any), closes all other event-pending requests and audits those transitions. A withdrawal/acceptance race yields one legal terminal state, never both effects.
+
+Redemption is limited per authenticated account (default60/min) and direct remote IP (default600/min), with bounded20000-key single-instance memory and no forwarding-header trust. Property teamforge.security.invite-attempts-per-minute controls the account limit (IP=10x); exhaustion429 RATE_LIMITED/Retry-After60. Tests raise limits explicitly for legitimate contention; no production bypass endpoint exists. Replica-wide limiting and trusted reverse-proxy configuration remain deployment/hardening work.
+
 ## M3 contract update (current)
 This supersedes M2's unkeyed-create and lost-response limitations below. All existing session authentication, CSRF, validation and resource permissions remain required.
 

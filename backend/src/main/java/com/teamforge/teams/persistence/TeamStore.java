@@ -121,7 +121,8 @@ public class TeamStore {
     public boolean mayReadAudit(UUID team, UUID actor) {
         return Boolean.TRUE.equals(jdbc.queryForObject("""
             SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id=? AND user_id=?)
-                OR EXISTS(SELECT 1 FROM audit_events WHERE team_id=? AND
+                OR EXISTS(SELECT 1 FROM audit_events WHERE team_id=? AND action IN
+                    ('TEAM_CREATED','MEMBER_ADMITTED','MEMBER_LEFT','MEMBER_REMOVED','LEADERSHIP_TRANSFERRED') AND
                     (actor_id=? OR (target_type='USER' AND target_id=?)))
             """,Boolean.class,team,actor,team,actor,actor));
     }

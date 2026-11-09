@@ -1,5 +1,16 @@
 # Database design
 
+## M4 implemented V5 (current)
+V1–V4 remain unchanged. V5 adds team_invitations and join_requests, legal-transition enforcement, and invitation/request audit actions.
+
+- team_invitations: UUID PK, event/team composite FK ON DELETE CASCADE, unique token_hash CHAR(64), database created_at/expires_at (+24h), optional revoked_at. A partial unique(team_id) WHERE revoked_at IS NULL permits one current code generation (possibly expired) per team. Rotation revokes that generation before inserting the next. Expired/revoked hashes remain until team deletion; no plaintext column or issuance-response cache exists.
+- join_requests: UUID PK, matching event/team FK ON DELETE CASCADE, event/applicant FK to stable anchors, checked PENDING/ACCEPTED/DECLINED/WITHDRAWN/CLOSED state, database timestamps. Partial unique(team_id,applicant_id) WHERE PENDING prevents duplicate active requests. Applicant/state/ID and team/created_at/ID indexes support cleanup/listing; UUID PK supports cursor ordering. UPDATE trigger permits only PENDING to a terminal state, preserving identity/event/team/applicant fields. Terminal rows cannot reopen; applicants may create a new request after resolution while still eligible.
+- Audit action check additionally permits INVITE_ROTATED and REQUEST_CREATED/ACCEPTED/DECLINED/WITHDRAWN/CLOSED. Snapshot actor/user/team identifiers and database timestamps persist after active-team deletion. No token or token hash is audited.
+
+All membership insertion remains in M3's shared admission primitive. After admission or team creation, RequestResolution locks this applicant's pending rows in UUID order and resolves them atomically. It never acquires another team's lock. Every application request writer takes the same applicant anchor first; deletion cascades may remove subordinate rows but never need that applicant anchor. Thus cleanup does not invert team/participant locking. Existing unique event membership, capacity trigger and deferred leader FK remain final guards.
+
+Successful outer JOIN/ACCEPT and inner admission outcomes commit in the same transaction with membership/request/audit state. Stored response status supports200 acceptance as well as201 creation/redemption; historical responses remain without cascading FKs. See [locks](architecture.md), [contract](api-contract.md), [verification](verification-m4.md).
+
 ## M3 implemented V4 (current)
 V1–V3 are unchanged. V4 adds idempotency_records and extends the immutable audit action check with MEMBER_ADMITTED. The M2 table descriptions below remain valid; their statement that idempotency is absent is historical.
 
