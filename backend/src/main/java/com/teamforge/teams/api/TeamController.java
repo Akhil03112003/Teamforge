@@ -16,13 +16,16 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class TeamController {
     private final TeamService teams;
-    public TeamController(TeamService teams) { this.teams=teams; }
+    private final com.teamforge.teams.application.BoardQuery board;
+    public TeamController(TeamService teams,com.teamforge.teams.application.BoardQuery board) { this.teams=teams;this.board=board; }
     @GetMapping("/hackathons")
     public Items<Hackathon> events() { return teams.events(); }
     @GetMapping("/hackathons/{event}/teams")
-    public Board board(@PathVariable UUID event, @RequestParam(required=false) UUID cursor,
-                       @RequestParam(defaultValue="50") @Min(1) @Max(50) int limit) {
-        return teams.board(event,cursor,limit);
+    public com.teamforge.teams.application.BoardQuery.Page board(@PathVariable UUID event, @RequestParam(required=false) String cursor,
+                       @RequestParam(defaultValue="50") @Min(1) @Max(50) int limit,
+                       @RequestParam(required=false) String skill,@RequestParam(defaultValue="false") boolean openSeats,
+                       @RequestParam(required=false) String status,@RequestParam(defaultValue="id") String sort) {
+        return board.board(event,cursor,limit,skill,openSeats,status,sort);
     }
     @GetMapping("/hackathons/{event}/me/team")
     public ResponseEntity<Team> mine(@PathVariable UUID event, @AuthenticationPrincipal ParticipantPrincipal actor) {

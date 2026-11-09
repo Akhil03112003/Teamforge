@@ -1,5 +1,5 @@
 # Implementation plan
-M4 invitation/request automated gates passed; see verification-m4.md for actual evidence and limitations. M5 and later work require separate authorization. Each milestone updates progress, records material decisions and reports actual checks/failures.
+M5 now includes discovery, SSE and matching per latest user scope. Automated and HTTP/proxy gates passed; evidence/limitations in verification-m5.md; M6 and later work require separate authorization. Each milestone updates progress, records material decisions and reports actual checks/failures.
 
 | Milestone | Dependency | Acceptance gate |
 |---|---|---|
@@ -10,8 +10,8 @@ M4 invitation/request automated gates passed; see verification-m4.md for actual 
 | M2 Team lifecycle | Reverified M1 | Additive constraints, create/edit/leave/remove/succession/deletion/audit, dashboard; Java21 real-PostgreSQL and frontend gates |
 | M3 Concurrency/idempotency | Reviewed M2; new authorization | Persisted replay, race/rollback coverage and explicit last-seat acceptance; scope admission APIs only when authorized |
 | M4 Admission workflows | Reviewed M3 | Requests/invites use shared admission with transactional authorization; HTTP invite/approval concurrency tests; existing M2 removal preserved |
-| M5 Discovery | M4 | Board pagination and explainable ranking tested |
-| M6 Live updates | M5 | Authorized SSE, disconnect/refetch recovery tested |
+| M5 Live discovery/matching | M4 | Board filters/keysets, after-commit SSE/reconnect, explainable matching and HTTP/proxy verification |
+| M6 Visual polish | Reviewed M5 | Separately requested interface refinement; preserve M5 live behavior |
 | M7 UI | M2–M6 | Entire flow responsive and keyboard accessible |
 | M8 Hardening | M7 | >=20 API tests in CI, seed validation, security and measured load report |
 | M9 Delivery | M8; hosting choice | Live smoke checks, repository, URL, report, one-page design and <=5-minute video |
@@ -19,4 +19,4 @@ M4 invitation/request automated gates passed; see verification-m4.md for actual 
 Priority: concurrency correctness first, defensible decisions second, quality/tests/UX third. No gate may substitute planned checks for observed results.
 
 
-The latest scope places identity/profiles in M1-B and lifecycle/removal in M2. M3 covers explicitly requested concurrency/idempotency acceptance; later admission scope still requires authorization. M8 validates rate limits, large seed constraints and strict LOAD-01. M9 requires verified hosting/free-tier constraints, DEPLOY-01 and SUBMIT-01. M4 completion does not authorize M5.
+The latest scope places identity/profiles in M1-B and lifecycle/removal in M2. M3 covers explicitly requested concurrency/idempotency acceptance; later admission scope still requires authorization. M8 validates rate limits, large seed constraints and strict LOAD-01. M9 requires verified hosting/free-tier constraints, DEPLOY-01 and SUBMIT-01. M5 completion does not authorize M6.

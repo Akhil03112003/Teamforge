@@ -12,7 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TeamStore {
     private final JdbcTemplate jdbc;
-    public TeamStore(JdbcTemplate jdbc) { this.jdbc = jdbc; }
+    private final com.teamforge.live.EventStreamHub live;
+    public TeamStore(JdbcTemplate jdbc,com.teamforge.live.EventStreamHub live) { this.jdbc = jdbc;this.live=live; }
 
     public record Row(UUID id, UUID eventId, String name, String description,
                       List<String> skills, UUID leaderId) {}
@@ -114,6 +115,7 @@ public class TeamStore {
     public void audit(Row team, UUID actor, String action, String targetType, UUID target) {
         jdbc.update("INSERT INTO audit_events(id,hackathon_id,team_id,actor_id,action,target_type,target_id) VALUES (?,?,?,?,?,?,?)",
             UUID.randomUUID(),team.eventId(),team.id(),actor,action,targetType,target);
+        live.changed(team.eventId());
     }
     public boolean hasAudit(UUID team) {
         return Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM audit_events WHERE team_id=?)",Boolean.class,team));

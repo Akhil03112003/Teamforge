@@ -1,5 +1,15 @@
 # Progress
 
+## Current status — M5 review handoff
+M0–M5 implemented; M5 automated gates and HTTP/proxy smoke passed. Stop before M6. Older handoffs below are historical; M6–M9 not started.
+- Initial Git tree clean. Original133-test M4 baseline reverified successfully (3m51s). Final JDK21 clean verify:170 tests, zero failures/errors/skips, BUILD SUCCESS/executable packaging,4m07s. New25 PostgreSQL/HTTP discovery and12 scoring cases; all133 regressions retained.
+- V6 adds discovery indexes only, applied/validated against existing local PostgreSQL; V1–V5 untouched. Board filters/name-or-ID cursor sort/capacity/public leader data use committed snapshots and bounded set queries. Admission locking/idempotency unchanged.
+- SSE coalesces audited mutations per event/transaction and sends only after commit. Authenticated bounded queues/virtual writers/heartbeats/session cleanup; ready/reconnect/30s periodic REST reconciliation. No tokens/private workflow data in events. Explainable70/30 matching has deterministic UUID ties, IANA availability/default assumptions, bounded candidate work and private-field redaction.
+- Public50-contender invite regression:1 HTTP201/49 capacity conflicts, correct roster/nonmembers,351ms; no ordinary race deadlocks/timeouts. M3 independent50-connection races and recovery tests passed.
+- Final frontend typecheck/build passed (23 modules,171ms). Packaged backend/Vite proxy smoke passed authenticated SSE ready, committed invalidation, filtered board/suggestions, reconnect and REST reconciliation. No frontend runner/browser visual/keyboard result claimed.
+- One new-test compile assertion issue and one smoke console-encoding issue were corrected and rerun; full history in verification-m5.md. Native PostgreSQL18.6 Flyway tested-version warning remains; Docker denied daemon access. Testcontainers/PG17.7/remote CI, large seed/k6 and deployment remain unexecuted.
+- No dependencies installed, data reset, commit/push or M6 polish. Performance risks and complete file inventory: [verification](verification-m5.md). See [API](api-contract.md), [architecture](architecture.md), [decisions](decisions.md). Hosting selection remains open.
+
 ## Current status — M4 review handoff
 M0–M4 implemented; M4 automated gates passed. Stop before M5. Historical handoffs below are superseded by this section. M5–M9 not started.
 - Initial Git clean; original88-test M3 baseline rerun passed. Final Java21 Maven clean verify:133 tests, zero failures/errors/skips, BUILD SUCCESS/executable packaging,3m48s. New M4 coverage:44 workflow cases plus1 real rate-limit case; all original88 remain green.

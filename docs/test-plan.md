@@ -1,5 +1,10 @@
 # Test plan
 
+## M5 live discovery coverage
+LiveDiscoveryIntegrationTest adds25 real PostgreSQL/HTTP board paging/name ties/filter combinations/capacity/event scope/validation/committed-visibility checks; SSE after-commit coalescing, rollback silence, event scope, token/private-field redaction, heartbeats/disconnect cleanup, reconnect REST, logout/session handling, connection bounds and replay silence; suggestions authorization/exclusions/ranking/privacy/stability/limits/full-team/missing-profile cases. SuggestionScoringTest adds12 cases checking70/30 arithmetic, empty denominators, IANA overlap, explicit/default windows, DST, no double-counting and deterministic explanations. Existing133 regressions/public50-way admission races remain required.
+
+Maps REQ-01/02/08/09/10/11/12/13/17 to BOARD/LIVE/SUGGEST and SSE-01/API-29/39. Actual counts/commands/limitations are in verification-m5.md. HTTP/proxy smoke must exercise packaged backend plus Vite SSE forwarding and board refresh; frontend has no test runner, so no frontend unit/browser result is inferred from a successful build. No k6 target is claimed; M8 must measure board100 VUs/p95<200ms at seed scale and SSE/matching CPU/connection behavior.
+
 ## M4 implemented test coverage
 AdmissionWorkflowsIntegrationTest covers REQ-03/04/08/09/11/12 and request portions of REQ-17 using real PostgreSQL and public HTTP/security adapters. Exact execution counts/timings are in [verification-m4.md](verification-m4.md); earlier planned-only statements below are historical.
 

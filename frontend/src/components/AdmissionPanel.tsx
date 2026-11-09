@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { ApiError, decideRequest, myRequests, redeemInvitation, requestInbox, requestTeam, rotateInvitation, withdrawRequest,
   type JoinRequest, type Team } from '../api/client';
 
-export default function AdmissionPanel({ event, selected, userId, teamed, refresh, expired }: {
-  event: string; selected: Team | null; userId: string; teamed: boolean; refresh: () => void; expired: () => void;
+export default function AdmissionPanel({ event, selected, userId, teamed, liveRevision, refresh, expired }: {
+  event: string; selected: Team | null; userId: string; teamed: boolean; liveRevision: number; refresh: () => void; expired: () => void;
 }) {
   const [requests, setRequests] = useState<JoinRequest[]>([]);
   const [inbox, setInbox] = useState<JoinRequest[]>([]);
@@ -17,6 +17,7 @@ export default function AdmissionPanel({ event, selected, userId, teamed, refres
   const [notice, setNotice] = useState('');
   const [revision, setRevision] = useState(0);
   const keys = useRef(new Map<string, string>());
+  useEffect(() => { if (teamed) keys.current.clear(); }, [teamed]);
   const errorFocus = useRef<HTMLParagraphElement>(null);
   const leader = selected?.leaderId === userId;
   useEffect(() => { setIssued(null); }, [selected?.id, leader]);
@@ -33,7 +34,7 @@ export default function AdmissionPanel({ event, selected, userId, teamed, refres
     return () => { active = false; };
     // Parent remounts when the authenticated identity/event changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [event, selected?.id, leader, revision]);
+  }, [event, selected?.id, leader, revision, liveRevision]);
   async function act(work: () => Promise<void>, reload = true) {
     setBusy(true); setError(''); setNotice('');
     try { await work(); if (reload) setRevision(value => value + 1); } catch (reason) { failure(reason); } finally { setBusy(false); }

@@ -81,7 +81,7 @@ export interface Hackathon { id: string; name: string; minSize: number; maxSize:
 export interface TeamMember { userId: string; displayName: string; joinedAt: string; leader: boolean }
 export interface TeamSummary {
   id: string; name: string; description: string; leaderId: string;
-  status: 'INCOMPLETE' | 'READY'; minSize: number; maxSize: number; memberCount: number;
+  status: 'INCOMPLETE' | 'READY'; minSize: number; maxSize: number; memberCount: number; openSeats?: number; leaderDisplayName?: string;
 }
 export interface Team extends Omit<TeamSummary, 'memberCount'> { hackathonId: string; desiredSkills: string[]; members: TeamMember[] }
 export interface TeamInput { name: string; description: string; desiredSkills: string[] }
@@ -109,13 +109,26 @@ export async function listHackathons(): Promise<Hackathon[]> {
     return { id: text(event.id), name: text(event.name), minSize: count(event.minSize), maxSize: count(event.maxSize), active: event.active };
   });
 }
-export async function listTeams(event: string, cursor?: string): Promise<{ items: TeamSummary[]; nextCursor: string | null }> {
-  const result = object(await request('/hackathons/' + encodeURIComponent(event) + '/teams?limit=50' + (cursor ? '&cursor=' + encodeURIComponent(cursor) : '')));
+export interface BoardFilters { skill?: string; openSeats?: boolean; status?: string; sort?: 'id' | 'name' }
+export async function listTeams(event: string, cursor?: string, filters: BoardFilters = {}): Promise<{ items: TeamSummary[]; nextCursor: string | null }> {
+  const query = new URLSearchParams({ limit: '50', sort: filters.sort ?? 'id' });
+  if (cursor) query.set('cursor', cursor);
+  if (filters.skill) query.set('skill', filters.skill);
+  if (filters.openSeats) query.set('openSeats', 'true');
+  if (filters.status) query.set('status', filters.status);
+  const result = object(await request('/hackathons/' + encodeURIComponent(event) + '/teams?' + query));
   return { items: list(result.items).map(value => {
     const team = object(value); return { id: text(team.id), name: text(team.name), description: text(team.description), leaderId: text(team.leaderId),
-      status: readiness(team.status), minSize: count(team.minSize), maxSize: count(team.maxSize), memberCount: count(team.memberCount) };
+      status: readiness(team.status), minSize: count(team.minSize), maxSize: count(team.maxSize), memberCount: count(team.memberCount), openSeats: count(team.openSeats), leaderDisplayName: text(team.leaderDisplayName) };
   }), nextCursor: result.nextCursor === null ? null : text(result.nextCursor) };
 }
+export interface Suggestion { userId: string; displayName: string; score: number; skillScore: number; timeScore: number; reasons: string[] }
+export async function teammateSuggestions(team: string): Promise<Suggestion[]> {
+  const result = object(await request('/teams/' + encodeURIComponent(team) + '/suggestions?limit=20'));
+  function score(value: unknown): number { if (typeof value !== 'number' || value < 0 || value > 100) throw new ApiError('Unexpected suggestion score.'); return value; }
+  return list(result.items).map(value => { const row = object(value); return { userId: text(row.userId), displayName: text(row.displayName), score: score(row.score), skillScore: score(row.skillScore), timeScore: score(row.timeScore), reasons: list(row.reasons).map(text) }; });
+}
+export async function checkSession(): Promise<void> { await request('/me'); }
 export async function myTeam(event: string): Promise<Team | null> {
   const result = await request('/hackathons/' + encodeURIComponent(event) + '/me/team');
   return result === undefined ? null : teamResponse(result);

@@ -1,5 +1,8 @@
 # Database design
 
+## M5 additive V6
+V1–V5 unchanged. V6 adds teams_desired_skills_gin on desired_skills and teams_board_name_idx on (hackathon_id,lower(name) COLLATE C,id). Board uses existing team_members(team_id,joined_at,id) for counts, unique(event,user) for eligibility and profile skills/availability keys for matching. No counters, live-event table, membership rewrite or database reset. SSE is after-commit transient invalidation, not an authoritative event store. Matching reads private profile data internally and returns only limited derived results. See architecture.md and api-contract.md for stable pagination/scoring limitations.
+
 ## M4 implemented V5 (current)
 V1–V4 remain unchanged. V5 adds team_invitations and join_requests, legal-transition enforcement, and invitation/request audit actions.
 

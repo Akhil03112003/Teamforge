@@ -1,5 +1,10 @@
 # Product specification
 
+## M5 live board and recommendations
+Participants filter the board by desired skill, open seats and readiness, sort by stable team ID or name, load further pages and view team details with existing request/invite actions. Invalidation refreshes committed REST state; disconnected/reconnecting status is announced. Reconnect/periodic refresh resets to page1, preserves the selected team where it still exists and refreshes request status. A deleted selected team is cleared. No event payload is treated as a roster or permission source.
+
+Current leaders see up to20 explainable eligible suggestions with normalized skill/time/total scores. Matching favors uncovered team-desired skills and overlap with the team's common collaboration availability. 50% skill coverage and100% overlap→65 overall;100% coverage and0% overlap→70. Empty desired/common denominators score zero rather than inventing compatibility. Weekly availability fallback is weekdays09:00–17:00 in each valid profile's IANA zone; seven UTC-day horizon/DST rules are documented in api-contract.md. Private schedules/zones/raw skill inventories are not exposed. Suggestions are advisory, not automatic admissions. M6 visual polish is not part of M5.
+
 ## M4 implemented invitations and request journeys
 This section supersedes earlier statements that joining is unavailable. Leaders generate/rotate private invitation codes; code is displayed only immediately after issuance and expires after24h. Rotation invalidates old codes. Codes are reusable until expiry/rotation/deletion; valid authenticated redemption directly joins if eligibility and capacity permit.
 
