@@ -43,6 +43,7 @@ class TeamLifecycleIntegrationTest {
             events.forEach(id -> jdbc.update("DELETE FROM teams WHERE hackathon_id=?",id));
             events.forEach(id -> jdbc.update("DELETE FROM event_participants WHERE hackathon_id=?",id));
             events.forEach(id -> jdbc.update("DELETE FROM hackathons WHERE id=?",id));
+            users.forEach(id -> jdbc.update("DELETE FROM idempotency_records WHERE actor_id=?",id));
             users.forEach(id -> jdbc.update("DELETE FROM users WHERE id=?",id));
         });
     }
@@ -57,6 +58,8 @@ class TeamLifecycleIntegrationTest {
         }
         HttpResponse<String> request(String method,String path,String body,boolean csrf,String contentType) throws Exception {
             var builder=HttpRequest.newBuilder(URI.create("http://localhost:"+port+"/api/v1"+path)).header("Content-Type",contentType);
+            if (method.equals("POST") && path.startsWith("/hackathons/") && path.endsWith("/teams"))
+                builder.header("Idempotency-Key",UUID.randomUUID().toString());
             if (csrf) builder.header("X-CSRF-TOKEN",json(get("/auth/csrf")).get("token").asText());
             return http.send(builder.method(method,body==null ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(body)).build(),HttpResponse.BodyHandlers.ofString());
         }
@@ -218,7 +221,7 @@ class TeamLifecycleIntegrationTest {
     }
     @Test void outerRollbackRevertsTeamMembershipAndAuditTogether() {
         assertThatThrownBy(() -> transaction.executeWithoutResult(status -> {
-            service.create(event,leader.id,new Create("Rolled back",null,null));throw new IllegalStateException("Synthetic rollback");
+            service.create(event,leader.id,new Create("Rolled back",null,null),UUID.randomUUID().toString());throw new IllegalStateException("Synthetic rollback");
         })).isInstanceOf(IllegalStateException.class);
         assertThat(count("teams",event)).isZero();assertThat(count("team_members",event)).isZero();assertThat(count("audit_events",event)).isZero();assertThat(count("event_participants",event)).isZero();
     }

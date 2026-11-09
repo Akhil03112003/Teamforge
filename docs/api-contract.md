@@ -1,4 +1,17 @@
-# Proposed API contract
+# API contract
+
+## M3 contract update (current)
+This supersedes M2's unkeyed-create and lost-response limitations below. All existing session authentication, CSRF, validation and resource permissions remain required.
+
+CREATE (POST /api/v1/hackathons/{event}/teams) now requires Idempotency-Key: 1–128 ASCII characters matching `[A-Za-z0-9][A-Za-z0-9._:-]{0,127}`. The existing request and 201 team response shapes are unchanged. Scope is authenticated caller + TEAM_CREATE + key. Fingerprints include operation version, event and normalized content: stripped name, default empty description, sorted normalized distinct skills. Equivalent normalized content replays; different content returns 409 IDEMPOTENCY_KEY_REUSED. Missing/invalid keys return 400 INVALID_IDEMPOTENCY_KEY after normal security checks.
+
+Completed requests replay the stored 201 JSON outcome, even if the team subsequently changes or is deleted; this historical result must be reconciled with current GET state. No effects or audit events are duplicated. The frontend retains one in-memory key for an unchanged pending creation intent and reuses it after failures; successful completion clears it. Keys are not session secrets.
+
+Production admission is internal only: MembershipAdmissionService.Command(teamId,participantId,actorId,authorization,idempotencyKey), returning Result(teamId,hackathonId,participantId,membershipId,memberCount). MEMBERSHIP_ADMIT scopes keys separately; its fingerprint includes team, target and trusted authorization kind/proof. LeaderApproval checks actor against current locked leadership. Actor/proof are supplied by trusted application code, never arbitrary HTTP fields. No admission HTTP endpoint exists in M3. M4 will adapt invitation redemption and request acceptance to this service without weakening authorization.
+
+Fresh admissions can return TEAM_NOT_FOUND (404), LEADER_REQUIRED (403), ALREADY_TEAMED or TEAM_FULL (409). Completed replay does not rerun domain authorization against changed leadership; an authenticated caller can retrieve only their own operation/key outcome. Missing/changed content is still rejected. Failed mutations roll back key claims and may be retried. An anomalous committed IN_PROGRESS yields 409 IDEMPOTENCY_IN_PROGRESS, never automatic takeover. REQUEST_BUSY is 409 after bounded database retries; these busy responses include Retry-After: 1. OUTCOME_UNKNOWN is 503 on connection failure; reconcile state and retry keyed work with its original key. No automatic record expiry is implemented. Edit/leave/removal retain existing unkeyed contracts; only create/admission gain persisted replay in M3.
+
+Audit actions additionally include MEMBER_ADMITTED. See [storage](database-design.md), [locks](architecture.md) and [verification](verification-m3.md).
 
 ## M2 implemented team contracts (current)
 All routes below require the existing authenticated session. Every mutation requires CSRF. M2 does not require/acknowledge Idempotency-Key; persisted replay semantics remain M3. Earlier tables include future proposed endpoints that remain unavailable.

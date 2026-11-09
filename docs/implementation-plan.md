@@ -1,5 +1,5 @@
 # Implementation plan
-M0/M1 are complete. Latest user instruction authorizes M2 team lifecycle and its frontend slice. M3 and later work require separate authorization. Each milestone updates progress, records material decisions and reports actual checks/failures.
+M0–M3 automated implementation gates are complete; see verification-m3.md for evidence and limitations. M4 and later work require separate authorization. Each milestone updates progress, records material decisions and reports actual checks/failures.
 
 | Milestone | Dependency | Acceptance gate |
 |---|---|---|
@@ -9,7 +9,7 @@ M0/M1 are complete. Latest user instruction authorizes M2 team lifecycle and its
 | M1-B Authentication/profiles | M1-A gate passed; local credentials approved | Full participant flow, Java 21 verify, frontend checks and PostgreSQL verification |
 | M2 Team lifecycle | Reverified M1 | Additive constraints, create/edit/leave/remove/succession/deletion/audit, dashboard; Java21 real-PostgreSQL and frontend gates |
 | M3 Concurrency/idempotency | Reviewed M2; new authorization | Persisted replay, race/rollback coverage and explicit last-seat acceptance; scope admission APIs only when authorized |
-| M4 Admission/removal | M3 | Requests, invites, removal; 50-contender test passes |
+| M4 Admission workflows | Reviewed M3 | Requests/invites use shared admission with transactional authorization; HTTP invite/approval concurrency tests; existing M2 removal preserved |
 | M5 Discovery | M4 | Board pagination and explainable ranking tested |
 | M6 Live updates | M5 | Authorized SSE, disconnect/refetch recovery tested |
 | M7 UI | M2–M6 | Entire flow responsive and keyboard accessible |
@@ -19,4 +19,4 @@ M0/M1 are complete. Latest user instruction authorizes M2 team lifecycle and its
 Priority: concurrency correctness first, defensible decisions second, quality/tests/UX third. No gate may substitute planned checks for observed results.
 
 
-The latest scope places identity/profiles in M1-B and lifecycle/removal in M2. M3 covers explicitly requested concurrency/idempotency acceptance; later admission scope still requires authorization. M8 validates rate limits, large seed constraints and strict LOAD-01. M9 requires verified hosting/free-tier constraints, DEPLOY-01 and SUBMIT-01. M2 completion does not authorize M3.
+The latest scope places identity/profiles in M1-B and lifecycle/removal in M2. M3 covers explicitly requested concurrency/idempotency acceptance; later admission scope still requires authorization. M8 validates rate limits, large seed constraints and strict LOAD-01. M9 requires verified hosting/free-tier constraints, DEPLOY-01 and SUBMIT-01. M3 completion does not authorize M4.

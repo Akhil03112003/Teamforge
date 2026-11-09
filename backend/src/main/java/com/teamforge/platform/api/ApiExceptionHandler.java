@@ -21,8 +21,9 @@ public class ApiExceptionHandler {
     }
     @ExceptionHandler(ApiException.class)
     ResponseEntity<ApiErrors.ErrorBody> application(ApiException error) {
-        return ResponseEntity.status(error.status())
-            .body(ApiErrors.body(error.code(), error.getMessage(), Map.of()));
+        var response=ResponseEntity.status(error.status());
+        if (error.code().equals("REQUEST_BUSY") || error.code().equals("IDEMPOTENCY_IN_PROGRESS")) response.header("Retry-After","1");
+        return response.body(ApiErrors.body(error.code(), error.getMessage(), Map.of()));
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ApiErrors.ErrorBody> validation(MethodArgumentNotValidException error) {

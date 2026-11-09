@@ -33,12 +33,14 @@ async function request(path: string, init: RequestInit = {}): Promise<unknown> {
   }
   return response.status === 204 ? undefined : response.json();
 }
-async function mutate(path: string, body?: string, contentType = 'application/json', method = 'POST') {
+async function mutate(path: string, body?: string, contentType = 'application/json', method = 'POST', idempotencyKey?: string) {
   // Obtain a fresh session token for each mutation, including after login/logout rotation.
   const csrf = await request('/auth/csrf');
   if (!csrf || typeof csrf !== 'object' || !('token' in csrf) || typeof csrf.token !== 'string'
     || !('headerName' in csrf) || csrf.headerName !== 'X-CSRF-TOKEN') throw new ApiError('Refresh the page and try again.');
-  return request(path, { method, body, headers: { 'Content-Type': contentType, 'X-CSRF-TOKEN': csrf.token } });
+  const headers: Record<string, string> = { 'Content-Type': contentType, 'X-CSRF-TOKEN': csrf.token };
+  if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
+  return request(path, { method, body, headers });
 }
 function profileResponse(value: unknown): Profile {
   if (!value || typeof value !== 'object' || !('displayName' in value) || typeof value.displayName !== 'string'
@@ -119,8 +121,8 @@ export async function myTeam(event: string): Promise<Team | null> {
   return result === undefined ? null : teamResponse(result);
 }
 export async function getTeam(id: string): Promise<Team> { return teamResponse(await request('/teams/' + encodeURIComponent(id))); }
-export async function createTeam(event: string, input: TeamInput): Promise<Team> {
-  return teamResponse(await mutate('/hackathons/' + encodeURIComponent(event) + '/teams', JSON.stringify(input)));
+export async function createTeam(event: string, input: TeamInput, idempotencyKey: string): Promise<Team> {
+  return teamResponse(await mutate('/hackathons/' + encodeURIComponent(event) + '/teams', JSON.stringify(input), 'application/json', 'POST', idempotencyKey));
 }
 export async function updateTeam(id: string, input: Partial<TeamInput>): Promise<Team> {
   return teamResponse(await mutate('/teams/' + encodeURIComponent(id), JSON.stringify(input), 'application/json', 'PATCH'));

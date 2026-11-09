@@ -1,5 +1,14 @@
 # Progress
 
+## Current status — M3 review handoff
+M0–M3 implemented; M3 automated gates passed. Stop before M4. Historical handoffs below are superseded by this section. Browser visual/keyboard runtime review, remote CI and deployment remain unverified.
+- Reverified the original 61-test baseline before changes. Final Java21 Maven clean verify: 88 tests, zero failures/errors/skips; executable packaging successful, 2m52s. New concurrency/recovery class: 27 cases, 33.135s.
+- Three final-seat races each used 50 independent PostgreSQL connections and distinct eligible users: exactly one admission, 49 TEAM_FULL, correct maximum roster and no loser memberships. Durations 5214/98/100ms; no ordinary-race deadlocks or lock timeouts. Deliberate recovery tests separately exercised one deadlock, released timeout retry and three-timeout bounded exhaustion.
+- V4 applied/validated on existing local PostgreSQL without resetting data or editing V1–V3. Shared production admission and atomic persistent create/admission replay implemented; immutable audit retained. No public admission endpoint or M4 workflow.
+- Frontend typecheck and production build passed. Create now sends/reuses an intent key. Existing lifecycle/authentication behavior remains covered. No application dependencies added.
+- Docker daemon inaccessible; tests used native PostgreSQL18.6. Flyway tested-version warning remains; PostgreSQL17.7 CI, remote Actions, load benchmark, seed acceptance and deployment were not run.
+- No commit/push. See [M3 verification](verification-m3.md), [decisions](decisions.md), [contract](api-contract.md) and [architecture](architecture.md). M4–M9 not started.
+
 ## Current status — M2 review handoff
 M0/M1 complete. M2 implemented and automated/backend/proxy gates passed; browser visual/keyboard runtime review remains unavailable. M3–M9 not started. Stop before M3.
 - Initial Git tree clean at 857528f. Reverified M1 Java21 clean verify: all34 tests passed before M2 changes.

@@ -1,6 +1,8 @@
 package com.teamforge.teams.application;
 
 import com.teamforge.platform.api.ApiException;
+import com.teamforge.platform.idempotency.IdempotentMutations;
+import com.teamforge.platform.transactions.MutationTransactions;
 import com.teamforge.teams.api.TeamContracts.*;
 import com.teamforge.teams.persistence.TeamStore;
 import com.teamforge.teams.persistence.TeamStore.Row;
@@ -11,10 +13,16 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(isolation = Isolation.READ_COMMITTED)
 public class TeamService {
     private final TeamStore store;
-    public TeamService(TeamStore store) { this.store=store; }
+    private final IdempotentMutations mutations;
+    private final MutationTransactions transactions;
+    private final MembershipAdmissionService admission;
+    public TeamService(TeamStore store, IdempotentMutations mutations, MutationTransactions transactions,
+                       MembershipAdmissionService admission) {
+        this.store=store;this.mutations=mutations;this.transactions=transactions;this.admission=admission;
+    }
+    private record CreationFingerprint(int version,UUID event,Create input) {}
     @Transactional(readOnly=true)
     public Items<Hackathon> events() { return new Items<>(store.events()); }
     @Transactional(readOnly=true, isolation=Isolation.REPEATABLE_READ)
@@ -28,7 +36,12 @@ public class TeamService {
         store.event(event);
         return store.membership(event,user).map(id -> store.detail(store.find(id,false)));
     }
-    public Team create(UUID event, UUID actor, Create request) {
+    public Team create(UUID event, UUID actor, Create request, String key) {
+        var normalized=new Create(name(request.name()),request.description()==null ? "" : request.description(),skills(request.desiredSkills()));
+        return mutations.execute(actor,"TEAM_CREATE",key,new CreationFingerprint(1,event,normalized),Team.class,
+            () -> createLocked(event,actor,normalized));
+    }
+    private Team createLocked(UUID event, UUID actor, Create request) {
         var bounds=store.event(event);
         if (bounds.maxSize()<1) throw new ApiException(409,"TEAM_FULL","No team capacity is available.");
         store.ensureParticipant(event,actor);
@@ -43,10 +56,14 @@ public class TeamService {
             throw new ApiException(409,"TEAM_CONFLICT","Team membership changed. Reload and try again.");
         }
         var row=store.find(id,false);
+        admission.creator(row,actor);
         store.audit(row,actor,"TEAM_CREATED","TEAM",id);
         return store.detail(row);
     }
     public Team edit(UUID id, UUID actor, Update request) {
+        return transactions.run(() -> editLocked(id,actor,request));
+    }
+    private Team editLocked(UUID id, UUID actor, Update request) {
         var team=store.find(id,true);
         requireLeader(team,actor);
         String name=request.name()==null ? team.name() : name(request.name());
@@ -59,6 +76,9 @@ public class TeamService {
         return store.detail(store.find(id,false));
     }
     public Leave leave(UUID id, UUID actor) {
+        return transactions.run(() -> leaveLocked(id,actor));
+    }
+    private Leave leaveLocked(UUID id, UUID actor) {
         var locator=store.find(id,false);
         store.lockParticipant(locator.eventId(),actor);
         var team=store.find(id,true);
@@ -80,6 +100,9 @@ public class TeamService {
         return new Leave(id,false,leader);
     }
     public void remove(UUID id, UUID actor, UUID target) {
+        transactions.run(() -> { removeLocked(id,actor,target);return null; });
+    }
+    private void removeLocked(UUID id, UUID actor, UUID target) {
         if (actor.equals(target)) throw new ApiException(409,"USE_LEAVE","Use Leave team to remove yourself.");
         var locator=store.find(id,false);
         store.lockParticipant(locator.eventId(),target);

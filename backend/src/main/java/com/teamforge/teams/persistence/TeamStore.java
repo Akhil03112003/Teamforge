@@ -40,6 +40,9 @@ public class TeamStore {
     public void ensureParticipant(UUID event, UUID user) {
         jdbc.update("INSERT INTO event_participants(hackathon_id,user_id) VALUES (?,?) ON CONFLICT DO NOTHING",event,user);
     }
+    public boolean participantExists(UUID user) {
+        return Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM users WHERE id=?)",Boolean.class,user));
+    }
     public void lockParticipant(UUID event, UUID user) {
         // Serializes this event/person without blocking FK key-share checks on successors.
         jdbc.query("SELECT user_id FROM event_participants WHERE hackathon_id = ? AND user_id = ? FOR NO KEY UPDATE",
@@ -57,7 +60,14 @@ public class TeamStore {
             statement.setArray(6,connection.createArrayOf("text",skills.toArray(String[]::new)));
             return statement;
         });
-        jdbc.update("INSERT INTO team_members(id,hackathon_id,team_id,user_id) VALUES (?,?,?,?)",UUID.randomUUID(),event,id,user);
+    }
+    public int memberCount(UUID team) {
+        return jdbc.queryForObject("SELECT count(*) FROM team_members WHERE team_id=?",Integer.class,team);
+    }
+    public UUID addMember(Row team,UUID user) {
+        UUID id=UUID.randomUUID();
+        jdbc.update("INSERT INTO team_members(id,hackathon_id,team_id,user_id) VALUES (?,?,?,?)",id,team.eventId(),team.id(),user);
+        return id;
     }
     public void edit(Row team, String name, String description, List<String> skills) {
         jdbc.update(connection -> {

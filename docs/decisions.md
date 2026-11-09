@@ -1,5 +1,14 @@
 # Decisions
 
+## M3 implementation record — 2026-11-09
+The user authorized shared admission, persisted create/admission idempotency and actual PostgreSQL races, without M4 workflows. Baseline 61 tests passed before changes. This section supersedes M2 statements that keys are not required or replay is deferred.
+
+Implemented within the approved architecture: shared MembershipAdmissionService; internal sealed LeaderApproval authority checked under the team lock; creator uses the same append checks. There is no direct-join endpoint, test-only route, invite/request workflow, new dependency or infrastructure. READ COMMITTED root mutations retain anchor NO KEY UPDATE before team FOR UPDATE; keyed claims precede both. Lifecycle mutations use the same bounded transaction runner. Existing unique/composite/deferred/capacity constraints remain authoritative.
+
+V4 persists caller/operation/key, canonical SHA-256 fingerprint and successful 201 JSON result atomically with mutation/audit. Keyed create is now mandatory; the frontend reuses its pending intent key. Failed work rolls back the key; anomalous committed IN_PROGRESS conflicts without takeover. Completed records remain indefinitely, including deleted resources; no cleanup policy is silently assumed. Future retention/operational recovery requires review. Lock/statement/transaction defaults are 5/15/30 seconds; three root attempts handle identified rolled-back transient conflicts, with no fragment retry or blind retry after connection loss.
+
+Docker remains unavailable, so genuine native PostgreSQL18.6 was used with independent connections, not mocked locks. Three 50-contender races and deliberate deadlock/timeout recovery passed within the final 88-test Java21 verify. PostgreSQL18 Flyway compatibility warning remains a documented limitation; CI17.7 and remote GitHub Actions were not run. Free-tier deployment selection remains open. M4 must add transactional request/invite authorization and consumption to this admission service; its HTTP admission race coverage remains future work.
+
 ## M2 team lifecycle implementation — 2026-11-09
 Latest user scope moves team lifecycle into M2 and reserves persisted idempotency/concurrency acceptance for M3. M1 was reverified first: Java 21 clean verify passed all 34 tests. Initial working tree was clean. No team admission, invite, request, SSE or suggestion endpoint is added.
 V3 adds event_participants lock anchors, teams, team_members and immutable audit_events without editing V1/V2. The approved logical memberships table is concretely named team_members as requested. Team leader membership is a deferred composite FK, so every active team has a valid member leader at commit. Snapshot audit identifiers intentionally have no cascading active-domain FKs.

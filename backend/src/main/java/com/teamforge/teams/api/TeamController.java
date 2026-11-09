@@ -30,7 +30,10 @@ public class TeamController {
     }
     @PostMapping("/hackathons/{event}/teams") @ResponseStatus(HttpStatus.CREATED)
     public Team create(@PathVariable UUID event, @AuthenticationPrincipal ParticipantPrincipal actor,
-                       @Valid @RequestBody Create request) { return teams.create(event,actor.id(),request); }
+                       @Valid @RequestBody Create request,
+                       @RequestHeader(value="Idempotency-Key",required=false) String key) {
+        return teams.create(event,actor.id(),request,key);
+    }
     @GetMapping("/teams/{id}")
     public Team detail(@PathVariable UUID id) { return teams.detail(id); }
     @GetMapping("/teams/{id}/members")

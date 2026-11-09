@@ -35,6 +35,7 @@ export default function TeamDashboard({ user, onSessionExpired }: { user: Partic
   const [revision, setRevision] = useState(0);
   const [confirmation, setConfirmation] = useState<{ type: 'leave' | 'remove'; userId?: string } | null>(null);
   const summary = useRef<HTMLDivElement>(null);
+  const pendingCreate = useRef<{ fingerprint: string; key: string } | null>(null);
   useEffect(() => { if (error) summary.current?.focus(); }, [error]);
   function failure(reason: unknown) {
     const problem = ApiError.from(reason);
@@ -106,7 +107,13 @@ export default function TeamDashboard({ user, onSessionExpired }: { user: Partic
     {loading ? <p role="status">Loading teams…</p> : !event ? <p>No hackathons are configured. Ask an organizer to configure an event.</p> : <>
       <p>Team limits: {event.minSize}–{event.maxSize}. Smaller teams are marked incomplete.</p>
       <div className="team-workspace"><div className="team-main">
-        {!own && <TeamForm busy={busy} submit={input => { void act(async () => { await createTeam(eventId, input); setNotice('Team created. You are its first member and leader.'); setRevision(value => value + 1); }); }} />}
+        {!own && <TeamForm busy={busy} submit={input => { void act(async () => {
+          const fingerprint = JSON.stringify({ eventId, input });
+          if (pendingCreate.current?.fingerprint !== fingerprint) pendingCreate.current = { fingerprint, key: crypto.randomUUID() };
+          await createTeam(eventId, input, pendingCreate.current.key);
+          pendingCreate.current = null;
+          setNotice('Team created. You are its first member and leader.'); setRevision(value => value + 1);
+        }); }} />}
         {selected && <section aria-labelledby="selected-team-heading" className="team-details">
           <h2 id="selected-team-heading">{selected.name}</h2><p>{selected.description || 'No description yet.'}</p>
           <p><strong>{selected.status === 'READY' ? 'Ready' : 'Incomplete'}</strong> · {selected.members.length}/{selected.maxSize} members{selected.status === 'INCOMPLETE' ? ' · needs ' + (selected.minSize - selected.members.length) + ' more' : ''}</p>

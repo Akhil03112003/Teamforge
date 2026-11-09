@@ -1,4 +1,11 @@
-# Proposed database design
+# Database design
+
+## M3 implemented V4 (current)
+V1–V3 are unchanged. V4 adds idempotency_records and extends the immutable audit action check with MEMBER_ADMITTED. The M2 table descriptions below remain valid; their statement that idempotency is absent is historical.
+
+idempotency_records has primary key (actor_id, operation, idempotency_key), request_hash CHAR(64), state, response_status, response_body JSONB, created_at and completed_at. Key length is 128; operation length 32. CHECK constraints distinguish IN_PROGRESS with null outcome fields from COMPLETED with a 2xx status, body and completion time. A partial completed_at index supports future reviewed retention operations. There are deliberately no cascading user/team FKs: replay survives active-resource deletion.
+
+The application inserts IN_PROGRESS and records COMPLETED in one transaction with domain and audit changes; normal intermediate state is never independently committed. Unique key insertion plus row locking coordinates concurrent copies across processes. Records are retained indefinitely in M3; no scheduled deletion, expiry takeover or failed-outcome cache exists. Failed/rolled-back work leaves no record. Team-member event uniqueness, capacity guard and deferred leader FK remain the V3 integrity guards. See [transaction protocol](architecture.md) and [executed tests](verification-m3.md).
 
 ## M2 implemented schema (current)
 V3 is additive; V1/V2 unchanged. The older proposed table list below remains context for future admission/idempotency work.
