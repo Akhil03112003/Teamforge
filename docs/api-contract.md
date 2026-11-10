@@ -1,5 +1,8 @@
 # API contract
 
+## M8-A implementation optimization, contract unchanged
+BOARD endpoints/authentication/validation/cursors/JSON remain unchanged. Native PostgreSQL cursor keys are retained privately from the last displayed row. Indexed candidate counts apply event/search/skill/keyset and capacity/readiness semantics before page LIMIT, with profiles joined afterward; min/max bounds share the same REPEATABLE READ snapshot. No new response fields/endpoints, no private sort-key exposure, no cache or admission-policy change. Six additional PostgreSQL/API regressions and the comparable load gate passed; see [verification](verification-m8-a-optimization.md). Both name and ID pages now use two business SELECTs, independent of page length.
+
 ## M7 security envelope (no business endpoint changes)
 API mutation bodies are bounded to 65,536 bytes by default, including chunked bodies; oversize returns `413 REQUEST_TOO_LARGE`. Malformed/duplicate form fields return `400 INVALID_REQUEST`. Login credentials must be body-encoded; login query strings are rejected. Unsupported media types/methods retain their 4xx status with a safe envelope. Unexpected errors return `500 INTERNAL_ERROR` and an opaque requestId, never submitted content/stack traces.
 

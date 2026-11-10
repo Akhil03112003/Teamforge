@@ -1,5 +1,9 @@
 # Implementation plan
-M5 includes discovery, SSE and matching; M6 completes UI/accessibility. The user authorized M7 CI/security/release hardening; its local evidence and remaining hosted/container/platform gates are in verification-m7.md. M8 and later require separate authorization. Each milestone updates progress, records material decisions and reports actual checks/failures.
+
+M8-A Phases A–D are complete for review: query/cursor changes, independent pool10/16/20 service trials,201 backend/16 browser regression gates and a comparable canonical k6 **p9542.566ms pass**. Seed and thresholds unchanged; default pool retained10. See verification-m8-a-optimization.md. Historical failed/blocker notes below are superseded; M8-B deployment still requires separate review/authorization.
+
+M8-A is the currently authorized seed/load subset: seed and local regression gates passed; k6 now executed with p95 602.705ms, failing the200ms gate. M8-B is not started/authorized. See verification-m8-a.md and load-test-report.md. The historical broad M8/M9 table below does not authorize deployment or continuation.
+M5 includes discovery, SSE and matching; M6 completes UI/accessibility. M7 CI/security/release hardening has local evidence and remaining hosted/container/platform gates in verification-m7.md. M8-A seed/load tooling is now authorized; M8-B and later require separate authorization. Each milestone updates progress, records material decisions and reports actual checks/failures.
 
 | Milestone | Dependency | Acceptance gate |
 |---|---|---|

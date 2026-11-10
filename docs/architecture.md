@@ -1,5 +1,10 @@
 # Architecture
 
+## M8-A board read optimization
+The read-only REPEATABLE READ board transaction still validates the event and derives authoritative counts from PostgreSQL. It now uses the returned native `sort_name` for continuation, avoiding a redundant query. One board SQL statement walks event/filter/keyset-eligible ordered candidates and uses indexed LATERAL roster counts before capacity/readiness filtering and LIMIT. A MATERIALIZED page bounds subsequent team/profile joins. These are server-side index probes, not per-team network/API queries; no denormalized counter/cache or new membership path. Existing min/max/status, C-collation/UUID keysets, sentinel rows,404/auth/privacy semantics remain tested.
+
+Pool10/16/20 direct-service trials favored retaining default10; no datasource setting changed permanently. Actual unchanged100-VU k6 at pool10 passed p9542.566ms. See [phase verification](verification-m8-a-optimization.md) and [load evidence](load-test-report.md), including shared-host limitations. M3 locks/idempotency and V1–V6 remain unchanged; M8-B is not started. Earlier implementation descriptions below are historical where superseded by this section.
+
 ## M7 release and security hardening
 The modular monolith, PostgreSQL invariants, M3 lock ordering and atomic idempotency semantics are unchanged. Optional Maven `web` packaging serves the built React assets from the same JAR/origin; the multi-stage non-root Dockerfile is a portable release recipe, not a deployed/tested image. Hosting remains open. CI uses isolated PostgreSQL and explicit Linux Chrome provisioning; see [CI](ci.md).
 

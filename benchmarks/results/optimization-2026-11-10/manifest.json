@@ -1,0 +1,1407 @@
+{
+  "scope": "Changes in this optimization follow-up; earlier pending M8 seed/investigation work was preserved. Temporary ignored drivers/logs are not release code.",
+  "primaryFiles": [
+    {
+      "path": "backend/src/main/java/com/teamforge/teams/application/BoardQuery.java",
+      "reason": "Native cursor key reuse and indexed candidate counts before bounded detail/profile joins; same contract/transaction."
+    },
+    {
+      "path": "backend/src/test/java/com/teamforge/teams/LiveDiscoveryIntegrationTest.java",
+      "reason": "Six PostgreSQL/API regression cases for cursor boundaries/ties/continuation and filtering/counts/auth/privacy."
+    },
+    {
+      "path": "benchmarks/explain-board.sql",
+      "reason": "Reproduce current optimized query; original helper preserved."
+    },
+    {
+      "path": "benchmarks/README.md",
+      "reason": "Current outcome and reproduction links; workload unchanged."
+    },
+    {
+      "path": "benchmarks/results/k6-status.json",
+      "reason": "Latest actual comparable k6 result pointer; original failure remains separately preserved."
+    },
+    {
+      "path": "README.md",
+      "reason": "Current local milestone and verification summary."
+    },
+    {
+      "path": "docs/verification-m8-a-optimization.md",
+      "reason": "Exact phase/command/test/performance/data accounting and every-file inventory."
+    },
+    {
+      "path": "docs/performance-investigation-m8-a.md",
+      "reason": "Before/after results and historical investigation preserved."
+    },
+    {
+      "path": "docs/load-test-report.md",
+      "reason": "Actual comparable k6 pass, baseline comparison and environment caveats."
+    },
+    {
+      "path": "docs/progress.md",
+      "reason": "Local M8-A completion and review boundary."
+    },
+    {
+      "path": "docs/verification-m8-a.md",
+      "reason": "Link latest optimization evidence; distinguish historical blocked/failed stages."
+    },
+    {
+      "path": "docs/architecture.md",
+      "reason": "Implemented read strategy and unchanged invariants/default pool."
+    },
+    {
+      "path": "docs/api-contract.md",
+      "reason": "Confirm unchanged externally visible contract and query/cursor semantics."
+    },
+    {
+      "path": "docs/decisions.md",
+      "reason": "Authorized query selection and evidence for retaining pool10."
+    },
+    {
+      "path": "docs/test-plan.md",
+      "reason": "Six added regressions,201/16 gates and actual LOAD-01 pass."
+    },
+    {
+      "path": "docs/requirements.md",
+      "reason": "Current requirements-to-evidence status."
+    },
+    {
+      "path": "docs/implementation-plan.md",
+      "reason": "M8-A complete for review; M8-B remains unauthorized."
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/backend-test-summary.json",
+      "reason": "Safe per-suite final Maven/JUnit counts and durations."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/baseline-explain.sql",
+      "reason": "Preserved original SQL diagnostic helper."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/final-board-explain.json",
+      "reason": "Final optimized representative PostgreSQL execution plan."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/integrity.json",
+      "reason": "Stage/source/script hashes and precise seed/public-data accounting."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/board-results.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/diagnostics.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/k6-summary.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/k6-version.txt",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/machine.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/pool-samples.jsonl",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/run-metadata.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/runtime-samples.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/seed-after-k6.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/seed-before-k6.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/comparison.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-0-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-0.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-1-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-1.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-2-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-2.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-3-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-3.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-4-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-4.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-5-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-5.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-6-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-6.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-7-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-7.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-a-pool-10/available-meters.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-a-pool-10/service-probe.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-a-pool-10/service-summary.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-10/available-meters.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-10/service-probe.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-10/service-summary.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-16/available-meters.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-16/service-probe.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-16/service-summary.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-20/available-meters.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-20/service-probe.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-20/service-summary.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/comparison.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-0-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-0.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-1-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-1.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-2-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-2.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-3-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-3.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-4-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-4.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-5-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-5.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-6-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-6.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-7-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    },
+    {
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-7.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence."
+    }
+  ],
+  "self": {
+    "path": "benchmarks/results/optimization-2026-11-10/manifest.json",
+    "reason": "Complete per-file inventory and purpose."
+  },
+  "pendingRepositoryFiles": [
+    {
+      "status": " M",
+      "path": ".gitignore",
+      "reason": "Earlier M8-A Python generated-file exclusions.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": " M",
+      "path": "README.md",
+      "reason": "Current local milestone and verification summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": " M",
+      "path": "backend/src/main/java/com/teamforge/teams/application/BoardQuery.java",
+      "reason": "Native cursor key reuse and indexed candidate counts before bounded detail/profile joins; same contract/transaction.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": " M",
+      "path": "backend/src/test/java/com/teamforge/teams/LiveDiscoveryIntegrationTest.java",
+      "reason": "Six PostgreSQL/API regression cases for cursor boundaries/ties/continuation and filtering/counts/auth/privacy.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": " M",
+      "path": "docs/api-contract.md",
+      "reason": "Confirm unchanged externally visible contract and query/cursor semantics.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": " M",
+      "path": "docs/architecture.md",
+      "reason": "Implemented read strategy and unchanged invariants/default pool.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": " M",
+      "path": "docs/database-design.md",
+      "reason": "Earlier M8-A isolated fixture schema/count documentation; no migration change.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": " M",
+      "path": "docs/decisions.md",
+      "reason": "Authorized query selection and evidence for retaining pool10.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": " M",
+      "path": "docs/implementation-plan.md",
+      "reason": "M8-A complete for review; M8-B remains unauthorized.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": " M",
+      "path": "docs/progress.md",
+      "reason": "Local M8-A completion and review boundary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": " M",
+      "path": "docs/requirements.md",
+      "reason": "Current requirements-to-evidence status.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": " M",
+      "path": "docs/test-plan.md",
+      "reason": "Six added regressions,201/16 gates and actual LOAD-01 pass.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": ".env.benchmark.example",
+      "reason": "Earlier safe placeholder-only benchmark environment template.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/README.md",
+      "reason": "Current outcome and reproduction links; workload unchanged.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/board.k6.js",
+      "reason": "Earlier unchanged canonical workload/report adapter or its tests, retained; workload hash verified.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/explain-board.sql",
+      "reason": "Reproduce current optimized query; original helper preserved.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/report.test.mjs",
+      "reason": "Earlier unchanged canonical workload/report adapter or its tests, retained; workload hash verified.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/result-summary.mjs",
+      "reason": "Earlier unchanged canonical workload/report adapter or its tests, retained; workload hash verified.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/board-explain.json",
+      "reason": "Earlier isolated seed/environment/repeat/diagnostic evidence, retained with the pending M8-A work.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/environment.json",
+      "reason": "Earlier isolated seed/environment/repeat/diagnostic evidence, retained with the pending M8-A work.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/available-meters.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/cursor-name-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/cursor-name.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/event-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/event.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/integrity.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/plan-summary.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-summary.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-0.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-0.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-1.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-1.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-2.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-2.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-3.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-3.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-4.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-4.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-5.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-5.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-6.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-6.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-7.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/prepared-variant-7.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/seed-after-investigation.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/service-probe.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/service-summary.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/sql-concurrency.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-0-page-0-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-0-page-0.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-0-page-1-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-0-page-1.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-0-page-2-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-0-page-2.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-1-page-0-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-1-page-0.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-1-page-1-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-1-page-1.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-1-page-2-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-1-page-2.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-2-page-0-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-2-page-0.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-2-page-1-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-2-page-1.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-2-page-2-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-2-page-2.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-3-page-0-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-3-page-0.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-3-page-1-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-3-page-1.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-3-page-2-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-3-page-2.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-4-page-0-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-4-page-0.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-4-page-1-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-4-page-1.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-4-page-2-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-4-page-2.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-5-page-0-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-5-page-0.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-5-page-1-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-5-page-1.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-5-page-2-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-5-page-2.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-6-page-0-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-6-page-0.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-6-page-1-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-6-page-1.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-6-page-2-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-6-page-2.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-7-page-0-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-7-page-0.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-7-page-1-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-7-page-1.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-7-page-2-plans.json",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/investigation-2026-11-10/variant-7-page-2.sql",
+      "reason": "Earlier read-only investigation evidence, preserved unchanged by the optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-2026-11-10/board-explain-after.json",
+      "reason": "Original failed canonical k6 baseline, preserved for comparison.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-2026-11-10/board-results.json",
+      "reason": "Original failed canonical k6 baseline, preserved for comparison.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-2026-11-10/diagnostics.json",
+      "reason": "Original failed canonical k6 baseline, preserved for comparison.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-2026-11-10/k6-summary.json",
+      "reason": "Original failed canonical k6 baseline, preserved for comparison.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-2026-11-10/k6-version.txt",
+      "reason": "Original failed canonical k6 baseline, preserved for comparison.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-2026-11-10/machine.json",
+      "reason": "Original failed canonical k6 baseline, preserved for comparison.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-2026-11-10/pool-samples.jsonl",
+      "reason": "Original failed canonical k6 baseline, preserved for comparison.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-2026-11-10/run-metadata.json",
+      "reason": "Original failed canonical k6 baseline, preserved for comparison.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-2026-11-10/runtime-samples.json",
+      "reason": "Original failed canonical k6 baseline, preserved for comparison.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-2026-11-10/seed-after-k6.json",
+      "reason": "Original failed canonical k6 baseline, preserved for comparison.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-2026-11-10/seed-before-k6.json",
+      "reason": "Original failed canonical k6 baseline, preserved for comparison.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/k6-status.json",
+      "reason": "Latest actual comparable k6 result pointer; original failure remains separately preserved.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/machine.json",
+      "reason": "Earlier isolated seed/environment/repeat/diagnostic evidence, retained with the pending M8-A work.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/backend-test-summary.json",
+      "reason": "Safe per-suite final Maven/JUnit counts and durations.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/baseline-explain.sql",
+      "reason": "Preserved original SQL diagnostic helper.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/final-board-explain.json",
+      "reason": "Final optimized representative PostgreSQL execution plan.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/integrity.json",
+      "reason": "Stage/source/script hashes and precise seed/public-data accounting.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/board-results.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/diagnostics.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/k6-summary.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/k6-version.txt",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/machine.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/pool-samples.jsonl",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/run-metadata.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/runtime-samples.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/seed-after-k6.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/k6-pool-10/seed-before-k6.json",
+      "reason": "Actual final canonical k6, environment, seed or runtime evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/comparison.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-0-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-0.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-1-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-1.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-2-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-2.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-3-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-3.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-4-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-4.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-5-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-5.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-6-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-6.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-7-plans.json",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/lateral-prototype/variant-7.sql",
+      "reason": "Selected indexed-count prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/manifest.json",
+      "reason": "Complete per-file inventory and purpose.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-a-pool-10/available-meters.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-a-pool-10/service-probe.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-a-pool-10/service-summary.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-10/available-meters.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-10/service-probe.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-10/service-summary.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-16/available-meters.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-16/service-probe.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-16/service-summary.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-20/available-meters.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-20/service-probe.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/phase-b-pool-20/service-summary.json",
+      "reason": "Actual independent direct-service stage/pool metrics, raw snapshots or summary.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/comparison.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-0-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-0.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-1-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-1.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-2-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-2.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-3-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-3.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-4-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-4.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-5-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-5.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-6-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-6.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-7-plans.json",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/optimization-2026-11-10/prototype/variant-7.sql",
+      "reason": "Rejected narrow-aggregate prototype SQL/plans and payload-equivalence evidence.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/seed-repeat.json",
+      "reason": "Earlier isolated seed/environment/repeat/diagnostic evidence, retained with the pending M8-A work.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/seed-restored-verification.json",
+      "reason": "Earlier isolated seed/environment/repeat/diagnostic evidence, retained with the pending M8-A work.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "benchmarks/results/seed-verification.json",
+      "reason": "Earlier isolated seed/environment/repeat/diagnostic evidence, retained with the pending M8-A work.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "docs/load-test-report.md",
+      "reason": "Actual comparable k6 pass, baseline comparison and environment caveats.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "docs/performance-investigation-m8-a.md",
+      "reason": "Before/after results and historical investigation preserved.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "docs/verification-m8-a-optimization.md",
+      "reason": "Exact phase/command/test/performance/data accounting and every-file inventory.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "docs/verification-m8-a.md",
+      "reason": "Link latest optimization evidence; distinguish historical blocked/failed stages.",
+      "optimizationSpecific": true
+    },
+    {
+      "status": "??",
+      "path": "scripts/benchmark/HashPassword.java",
+      "reason": "Earlier opt-in isolated seed/hash/environment/verifier tooling and tests, retained; not changed by optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "scripts/benchmark/Load-Environment.ps1",
+      "reason": "Earlier opt-in isolated seed/hash/environment/verifier tooling and tests, retained; not changed by optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "scripts/benchmark/seed.py",
+      "reason": "Earlier opt-in isolated seed/hash/environment/verifier tooling and tests, retained; not changed by optimization.",
+      "optimizationSpecific": false
+    },
+    {
+      "status": "??",
+      "path": "scripts/benchmark/test_seed.py",
+      "reason": "Earlier opt-in isolated seed/hash/environment/verifier tooling and tests, retained; not changed by optimization.",
+      "optimizationSpecific": false
+    }
+  ]
+}

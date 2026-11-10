@@ -148,7 +148,59 @@ class LiveDiscoveryIntegrationTest {
     }
     @Test void boardIdPagesHaveNoDuplicates(){another("Second",List.of());another("Third",List.of());var a=page(null,1,null,false,null,"id");var b=page(a.nextCursor(),1,null,false,null,"id");var c=page(b.nextCursor(),1,null,false,null,"id");assertThat(Set.of(a.items().getFirst().id(),b.items().getFirst().id(),c.items().getFirst().id())).hasSize(3);assertThat(c.nextCursor()).isNull();}
     @Test void boardNameSortAndTiesHaveStableCursor(){another("alpha",List.of());another("Alpha",List.of());var first=page(null,1,null,false,null,"name");var second=page(first.nextCursor(),1,null,false,null,"name");assertThat(first.items().getFirst().name().toLowerCase()).isEqualTo("alpha");assertThat(second.items().getFirst().id()).isNotEqualTo(first.items().getFirst().id());}
+    @Test void nameCursorUsesLastDisplayedPostgresKeyAcrossTiesAndUnicode(){
+        for(String name:List.of("Alpha","alpha","Ångström","ångström"))another(name,List.of());
+        var expected=jdbc.queryForList("SELECT id FROM teams WHERE hackathon_id=? ORDER BY lower(name) COLLATE \"C\",id",UUID.class,event);
+        var seen=new ArrayList<UUID>();String cursor=null;
+        do{var result=page(cursor,2,null,false,null,"name");seen.addAll(result.items().stream().map(BoardQuery.Summary::id).toList());cursor=result.nextCursor();
+            if(cursor!=null){var last=result.items().getLast();int split=cursor.lastIndexOf('.');String key=new String(Base64.getUrlDecoder().decode(cursor.substring(0,split)),StandardCharsets.UTF_8);
+                assertThat(key).isEqualTo(jdbc.queryForObject("SELECT lower(name) FROM teams WHERE id=?",String.class,last.id()));assertThat(cursor.substring(split+1)).isEqualTo(last.id().toString());}
+        }while(cursor!=null);
+        assertThat(seen).containsExactlyElementsOf(expected).doesNotHaveDuplicates();
+    }
+    @Test void exactBoundaryAndTerminalContinuationWorkForBothSorts(){
+        another("Boundary one",List.of());another("Boundary two",List.of());another("Boundary three",List.of());
+        for(String sort:List.of("id","name")){var first=page(null,2,null,false,null,sort);var last=page(first.nextCursor(),2,null,false,null,sort);
+            assertThat(first.items()).hasSize(2);assertThat(first.nextCursor()).isNotNull();assertThat(last.items()).hasSize(2);assertThat(last.nextCursor()).isNull();
+            var ids=new ArrayList<UUID>();ids.addAll(first.items().stream().map(BoardQuery.Summary::id).toList());ids.addAll(last.items().stream().map(BoardQuery.Summary::id).toList());assertThat(ids).doesNotHaveDuplicates();
+        }
+        String terminal=jdbc.queryForObject("SELECT id::text FROM teams WHERE hackathon_id=? ORDER BY id DESC LIMIT 1",String.class,event);
+        var empty=page(terminal,2,null,false,null,"id");assertThat(empty.items()).isEmpty();assertThat(empty.nextCursor()).isNull();
+    }
+    @Test void nameContinuationSurvivesDeletionOfCursorTeam(){
+        UUID first=another("aaa cursor",List.of());another("zzz following",List.of());var initial=page(null,1,null,false,null,"name");assertThat(initial.items().getFirst().id()).isEqualTo(first);
+        teams.leave(first,teams.detail(first).leaderId());var continued=page(initial.nextCursor(),50,null,false,null,"name");assertThat(continued.items()).hasSize(2).extracting(BoardQuery.Summary::id).doesNotContain(first);assertThat(continued.nextCursor()).isNull();
+    }
     @Test void boardSkillOpenAndReadinessFilters(){UUID target=another("Skilled",List.of("java"));assertThat(page(null,50,"JAVA",true,"INCOMPLETE","id").items()).extracting(BoardQuery.Summary::id).containsExactly(target);workflows.redeem(event,user(),workflows.rotate(target,teams.detail(target).leaderId()).code(),key());assertThat(page(null,50,"java",true,null,"id").items()).isEmpty();assertThat(page(null,50,"java",false,"READY","id").items()).hasSize(1);}
+    @Test void capacityAndReadinessAreFilteredBeforeTheNamePageLimit(){
+        UUID full=another("aaa optimization full",List.of("java"));UUID open=another("zzz optimization open",List.of("java"));
+        workflows.redeem(event,user(),workflows.rotate(full,teams.detail(full).leaderId()).code(),key());
+        var result=board.board(event,null,1,"java",true,"INCOMPLETE","name","optimization");
+        assertThat(result.items()).hasSize(1);var row=result.items().getFirst();assertThat(row.id()).isEqualTo(open);assertThat(row.memberCount()).isEqualTo(1);assertThat(row.openSeats()).isEqualTo(1);assertThat(result.nextCursor()).isNull();
+        var ready=board.board(event,null,1,"java",false,"READY","name","optimization");assertThat(ready.items()).extracting(BoardQuery.Summary::id).containsExactly(full);assertThat(ready.items().getFirst().memberCount()).isEqualTo(2);assertThat(ready.nextCursor()).isNull();
+        assertThat(board.board(event,null,1,"java",true,"READY","name","optimization").items()).isEmpty();
+    }
+    @Test void filteredDuplicateNamePagesKeepExactCountsAndNoSkippedTeams(){
+        var all=new HashSet<UUID>();var full=new HashSet<UUID>();
+        for(int i=0;i<8;i++){UUID id=another("Optimization duplicate",List.of("java"));all.add(id);if(i%2==0){workflows.redeem(event,user(),workflows.rotate(id,teams.detail(id).leaderId()).code(),key());full.add(id);}}
+        for(String sort:List.of("id","name"))for(String status:List.of("ALL","READY","INCOMPLETE")){
+            String cursor=null;var seen=new HashSet<UUID>();do{var result=board.board(event,cursor,2,"java",status.equals("INCOMPLETE"),status.equals("ALL")?null:status,sort,"Optimization duplicate");
+                for(var row:result.items()){assertThat(seen.add(row.id())).isTrue();int count=full.contains(row.id())?2:1;assertThat(row.memberCount()).isEqualTo(count);assertThat(row.openSeats()).isEqualTo(2-count);assertThat(row.status()).isEqualTo(count==2?"READY":"INCOMPLETE");}
+                cursor=result.nextCursor();
+            }while(cursor!=null);
+            var expected=new HashSet<>(all);if(status.equals("READY"))expected.retainAll(full);if(status.equals("INCOMPLETE"))expected.removeAll(full);assertThat(seen).isEqualTo(expected);
+        }
+    }
+    @Test void optimizedBoardRetainsAuthenticationMissingEventAndPrivateProjection() throws Exception {
+        try(var anonymous=HttpClient.newHttpClient()){
+            assertThat(anonymous.send(HttpRequest.newBuilder(URI.create("http://localhost:"+port+"/api/v1/hackathons/"+event+"/teams")).GET().build(),HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(401);
+        }
+        try(var client=new Client(leader)){
+            assertThat(client.send("GET","/hackathons/"+UUID.randomUUID()+"/teams",null,null).statusCode()).isEqualTo(404);
+            var result=client.send("GET","/hackathons/"+event+"/teams?sort=name&limit=1",null,null);assertThat(result.statusCode()).isEqualTo(200);assertThat(result.body()).doesNotContain("sortName","sort_name","@example.test","password_hash");
+            assertThat(mapper.readTree(result.body()).get("items")).hasSize(1);
+        }
+    }
     @Test void boardCapacityReflectsAdmissionAndDeparture(){UUID u=user();String code=invite();workflows.redeem(event,u,code,key());assertThat(page(null,50,null,false,null,"id").items().getFirst().openSeats()).isZero();teams.leave(team,u);assertThat(page(null,50,null,false,null,"id").items().getFirst().openSeats()).isEqualTo(1);}
     @Test void boardValidation(){error("VALIDATION_ERROR",()->page("bad",1,null,false,null,"id"));error("VALIDATION_ERROR",()->page(null,51,null,false,null,"id"));error("VALIDATION_ERROR",()->page(null,1,null,false,"bad","id"));error("VALIDATION_ERROR",()->page(null,1,null,false,null,"bad"));error("VALIDATION_ERROR",()->page("bad",1,null,false,null,"name"));}
     @Test void boardDoesNotExposeOtherEvents(){tx().executeWithoutResult(status->{UUID other=UUID.randomUUID();jdbc.update("INSERT INTO hackathons(id,name) VALUES (?,'Other')",other);teams.create(other,user(),new Create("Hidden team",null,null),key());assertThat(page(null,50,null,false,null,"id").items()).hasSize(1);status.setRollbackOnly();});}

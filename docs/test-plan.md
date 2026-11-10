@@ -1,5 +1,15 @@
 # Test plan
 
+## M8-A optimization acceptance
+Original195 backend tests plus6 new real-PostgreSQL cursor/count/filter/auth/privacy cases passed:201 total,0 failures/errors/skips. New cases cover complete native-key traversal through case/Unicode ties, exact boundaries/terminal and deleted-cursor continuation, capacity/readiness before LIMIT, filtered duplicate-name pages with exact counts, unauthenticated401/missing-event404/private-key exclusion. Existing event-scope, committed-visibility, admission and rollback tests remain active. Public50-contender race again yielded1 success/49 capacity conflicts. All16 browser tests/typecheck/build passed.
+
+Independent A/B/pool diagnostics remain separate from compliance. LOAD-01 now passed with the unchanged canonical script/100VUs/30s/180s and original pool10:198,602 measured requests,100% success,p9542.566ms. See [phase/every-file verification](verification-m8-a-optimization.md) and [load report](load-test-report.md). No threshold relaxation, migration change or M8-B authorization.
+
+## M8-A seed/load gates
+SEED-01 now uses the latest mixed-size fixture (400 teams each size1–5), not the older four-member-only proposal. Verify exactly10,000 users/profiles/anchors,2,000 teams,6,000 memberships,valid leaders/capacity/exclusivity, synthetic skills/zones/availability, repeated full-row match and rejection of normal/public/nonempty/corrupt targets. Six seed unit cases plus actual PostgreSQL seed/repeat/corruption-restoration and fresh-loader verification passed; safe reports are under benchmarks/results.
+
+LOAD-01 uses100 authenticated VUs,30s warm-up then180s measured,8 filter/sort variants with actual cursors; p95 strictly<200ms. Error/traffic quality gates and secret-free summary output are documented in [benchmark instructions](../benchmarks/README.md). Actual k6v2.3.0 run:43,883 measured requests,100% success,p95 **602.705ms — FAILED**. Earlier195 backend/16 browser cases passed; two report tests reran in this execution-only follow-up. See [verification](verification-m8-a.md) and [load report](load-test-report.md); M8-A remains open until the latency gate is met.
+
 ## M7 regression gates
 Retain all 171 backend cases and 15 browser cases from M6. Add 24 backend cases: eight bounded-body/form/bootstrap/config checks, four production-guard checks, one real HTTP session-cap check, ten real PostgreSQL security-envelope/CSRF/leader/event/idempotency cases and one SSE shutdown cleanup check. Add one browser regression preserving redemption announcements through membership/SSE reconciliation. These support REQ-09/10/11/13/17 and retain all concurrency/rollback gates; exact executions/counts are in [M7 verification](verification-m7.md).
 

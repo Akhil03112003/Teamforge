@@ -1,5 +1,8 @@
 # Database design
 
+## M8-A isolated benchmark fixtures
+No application migration/index changed. A seed-only `benchmark_metadata` marker lives only in the explicit benchmark target; it is not part of the production schema. The local execution used `teamforge_benchmark_m8a` schema with no public search-path fallback because CREATEDB was denied. V1–V6 applied there normally. Fixture tables retain all triggers/constraints:10,000 users/profiles/anchors,2,000 teams,6,000 members/audits,400 teams each size1–5 and4,000 unteamed. This supersedes the historical four-member seed proposal below. Exact all-column repeat verification refuses drift instead of resetting rows; lifecycle/admission runtime logic is unchanged. See [instructions](../benchmarks/README.md), [counts](../benchmarks/results/seed-verification.json) and [evidence](verification-m8-a.md).
+
 ## M5 additive V6
 V1–V5 unchanged. V6 adds teams_desired_skills_gin on desired_skills and teams_board_name_idx on (hackathon_id,lower(name) COLLATE C,id). Board uses existing team_members(team_id,joined_at,id) for counts, unique(event,user) for eligibility and profile skills/availability keys for matching. No counters, live-event table, membership rewrite or database reset. SSE is after-commit transient invalidation, not an authoritative event store. Matching reads private profile data internally and returns only limited derived results. See architecture.md and api-contract.md for stable pagination/scoring limitations.
 

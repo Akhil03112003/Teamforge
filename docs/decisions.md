@@ -1,5 +1,19 @@
 # Decisions
 
+## M8-A authorized optimization — 2026-11-10
+User explicitly authorized phased cursor/query optimization, pool experiments and a comparable rerun. Implemented native cursor-key reuse plus indexed LATERAL candidate roster counts, with capacity/readiness filters before the materialized page and profile joins afterward. Read-only REPEATABLE READ, min/max/404/event scope, API response/cursor semantics, M3 locks/idempotency and migrations remain unchanged. Compared narrower aggregate and indexed-count prototypes before selecting the latter from actual plans/payload equivalence.
+
+Pool10/16/20 service experiments did not justify increasing the default:10 had the best observed p95/throughput. No permanent datasource change; optional32 unnecessary. Final unchanged100-VU k6 passed at pool10 (p9542.566ms,100% success). Shared-host free-memory variation prevents treating the observed92.94% improvement as a controlled causal percentage.201 backend/16 browser tests passed. Detailed independent phase results and data accounting: [verification](verification-m8-a-optimization.md). This completes local M8-A acceptance for review, not remote CI, deployment or authorization for M8-B.
+
+## M8-A benchmark defaults and evidence — 2026-11-10
+Latest user scope authorizes reproducible seed/load tooling only. The earlier four-members-per-team seed proposal is superseded by the requested mixed-capacity dataset: one benchmark event with2/5 limits,400 teams at each size1–5,6,000 unique memberships and4,000 unteamed users among10,000 profiles. IDs/timestamps/distributions are fixed; one privately retained BCrypt hash is an explicit reproducibility input. No runtime business rule or M3 transaction/idempotency change.
+
+Prefer a dedicated benchmark database; the local role lacks CREATEDB, so the user-permitted isolated-schema fallback was implemented and actually verified. The loader binds JDBC/Flyway/psql to `teamforge_benchmark_m8a` only, with no public fallback. Seeding is explicit, refuses existing unmarked/corrupt data, preserves constraints and verifies a repeat instead of clearing/rebuilding. Seed-only advisory locking serializes bulk fixture creation; it is not a new production membership protocol. Fixtures remain for inspection; cleanup is manual and guarded by target/marker review.
+
+k6 workload defaults:100 distinct authenticated sessions,30s warm-up,180s measured100-VU reads,8 filter/sort variants with actual cursor traversal and200ms think time. Auth setup respects existing throttles. Strict p95<200ms is mandatory; <1% errors/checks>99% and18,000-request floor are proposed benchmark quality gates, not new product requirements. Report adapter fails closed on absent metrics and supports both documented summary layouts. No remote JS dependency.
+
+The initial k6 installation blocker is resolved. A follow-up real100-VU run measured p95 602.705ms and failed the200ms gate, with100% success. Hikari10 was saturated (peak81 waiters); local-only JMX/PG/process diagnostics and the post-run plan are retained. No application query/index/pool-default change was made from this single shared-host measurement; GC/serialization and system resource attribution remain incomplete. Hosted CI, provider/free-tier selection and controlled benchmark conditions remain open. [Evidence](verification-m8-a.md), [load report](load-test-report.md), [reproduction](../benchmarks/README.md). M8-A performance acceptance remains open; M8-B is not authorized.
+
 ## M7 implementation decisions — 2026-11-10
 Approved scope remains the single modular monolith, local credentials/server-managed sessions and unchanged M3 locks/idempotency. No core business rule changed.
 

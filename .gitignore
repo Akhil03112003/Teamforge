@@ -1,6 +1,8 @@
 # Java / Maven
 **/target/
 *.class
+__pycache__/
+*.pyc
 *.jar
 *.war
 *.ear
@@ -39,3 +41,6 @@ secrets/
 *.log
 logs/
 .tmp/
+# Generated benchmark diagnostics
+/benchmarks/results/*
+!/benchmarks/results/README.md
