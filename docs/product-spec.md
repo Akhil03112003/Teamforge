@@ -1,5 +1,10 @@
 # Product specification
 
+## M6 complete product interface
+Main navigation separates Discover teams, My team, Invitations & requests and Profile. The same active hackathon and live subscription remain across views; URL-backed event selection and session restoration survive refresh. Discover has whole-event name/description search, optional skill/readiness/open-seat filters, ID/name sort and pagination. Team cards lead to detail/request actions; My team handles creation, roster, readiness, succession/deletion, collapsible editing, suggestions and retained activity. Workflow view contains redemption, leader rotation/copy and paginated own requests/inbox with accept/decline/withdraw. Cached team names and inspect actions make requests navigable even when their team is not on the loaded board page.
+
+Destructive roster changes and invitation rotation use keyboard-accessible native dialogs with safe initial focus, focus containment, Escape/cancel and opener restoration. Errors are associated with form fields/groups; alerts receive focus, async outcomes use status announcements, and all controls have visible focus/touch targets. Reduced motion is respected. Empty/loading/retry/disconnection states remain actionable. Background refresh preserves drafts/intent keys and does not disable loaded workflow controls. Invite codes remain ephemeral and clear on leaving the view. Actual responsive, accessibility and end-to-end coverage and remaining limitations: verification-m6.md.
+
 ## M5 live board and recommendations
 Participants filter the board by desired skill, open seats and readiness, sort by stable team ID or name, load further pages and view team details with existing request/invite actions. Invalidation refreshes committed REST state; disconnected/reconnecting status is announced. Reconnect/periodic refresh resets to page1, preserves the selected team where it still exists and refreshes request status. A deleted selected team is cleared. No event payload is treated as a roster or permission source.
 

@@ -1,4 +1,18 @@
 # TeamForge local development (M1/M2)
+
+## M6 frontend checks
+From the repository root, with existing frontend dependencies installed:
+
+```powershell
+npm.cmd --prefix frontend run typecheck
+npm.cmd --prefix frontend run build
+npm.cmd --prefix frontend test
+```
+
+The test command starts its own fixture Vite server on127.0.0.1:5175, fails if that port is occupied, and drives installed Chrome/Chromium through Node's built-in runner. Set BROWSER_BIN if automatic Windows/Linux discovery does not find it. No browser package download or production database is needed for these15 tests. Isolated ignored test profiles use sandbox-disabled browser flags for this restricted Windows environment; production application settings are unchanged. Missing Chrome is reported as a failure, never silently counted as passing tests.
+
+For the opt-in real flow, start the normal backend and frontend using the commands below (or use Vite preview after building). Set TEAMFORGE_E2E_ORIGIN to that frontend origin and TEAMFORGE_E2E_EVENT to a dedicated min2/max5 QA hackathon; then run `node frontend/tests/real-flow.mjs`. It creates synthetic accounts through the UI and writes exact IDs for cleanup in .tmp/m6-e2e-fixtures.json. The verification report records the isolated harness used in this session; existing user events/accounts must not be reset. Never put invitation codes or credentials in the origin/event variables.
+
 Requires JDK 21, Maven >=3.6.3, Node 24 LTS/npm, and reachable local PostgreSQL. Docker is optional. Java must be a JDK, not just a JRE. Dependency installation needs registry access unless all required artifacts are cached.
 
 ## Database and backend

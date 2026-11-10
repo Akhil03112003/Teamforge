@@ -199,4 +199,12 @@ class LiveDiscoveryIntegrationTest {
         var groups=rows.stream().collect(java.util.stream.Collectors.groupingBy(com.teamforge.suggestions.SuggestionService.Suggestion::score));
         for(var tied:groups.values())assertThat(tied.stream().map(row->row.userId().toString()).toList()).isSorted();
     }
+    @Test void boardSearchUsesLiteralCaseInsensitiveNameAndDescriptionBeforePagination(){
+        UUID target=another("Searchable robotics",List.of());
+        teams.edit(target,teams.detail(target).leaderId(),new com.teamforge.teams.api.TeamContracts.Update(null,"Open-source collaborators",null));
+        assertThat(board.board(event,null,1,null,false,null,"id","ROBOTICS").items()).extracting(BoardQuery.Summary::id).containsExactly(target);
+        assertThat(board.board(event,null,1,null,false,null,"id","source collaborators").items()).extracting(BoardQuery.Summary::id).containsExactly(target);
+        assertThat(board.board(event,null,50,null,false,null,"id","%' OR true").items()).isEmpty();
+        error("VALIDATION_ERROR",()->board.board(event,null,1,null,false,null,"id","x".repeat(121)));
+    }
 }

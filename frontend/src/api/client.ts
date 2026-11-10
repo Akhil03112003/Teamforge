@@ -29,6 +29,9 @@ async function request(path: string, init: RequestInit = {}): Promise<unknown> {
         for (const [key, value] of Object.entries(error.fieldErrors)) if (typeof value === 'string') fields[key] = value;
       }
     }
+    if (response.status === 429) message += ' Wait ' + (response.headers.get('Retry-After') ?? 'a few') + ' seconds before trying again.';
+    if (response.status === 403) message += ' Refresh to check your session and current permissions.';
+    if (response.status === 409) message += ' Refresh the current state before retrying this action.';
     throw new ApiError(message, response.status, fields);
   }
   return response.status === 204 ? undefined : response.json();
@@ -109,11 +112,12 @@ export async function listHackathons(): Promise<Hackathon[]> {
     return { id: text(event.id), name: text(event.name), minSize: count(event.minSize), maxSize: count(event.maxSize), active: event.active };
   });
 }
-export interface BoardFilters { skill?: string; openSeats?: boolean; status?: string; sort?: 'id' | 'name' }
+export interface BoardFilters { q?: string; skill?: string; openSeats?: boolean; status?: string; sort?: 'id' | 'name' }
 export async function listTeams(event: string, cursor?: string, filters: BoardFilters = {}): Promise<{ items: TeamSummary[]; nextCursor: string | null }> {
   const query = new URLSearchParams({ limit: '50', sort: filters.sort ?? 'id' });
   if (cursor) query.set('cursor', cursor);
   if (filters.skill) query.set('skill', filters.skill);
+  if (filters.q) query.set('q', filters.q);
   if (filters.openSeats) query.set('openSeats', 'true');
   if (filters.status) query.set('status', filters.status);
   const result = object(await request('/hackathons/' + encodeURIComponent(event) + '/teams?' + query));

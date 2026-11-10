@@ -1,5 +1,10 @@
 # Architecture
 
+## M6 UI completion
+Hash-based application views retain a single mounted dashboard/live subscription and independent profile draft. Only a public hackathon ID enters the URL; session credentials/invitations never enter persistent browser storage. Typed API/CSRF paths and M3 mutations remain intact. Native dialogs/disclosures reduce custom focus/navigation logic; imperative action guards, mounted-response checks and selection guards prevent duplicate/stale UI effects. Workflow background refresh is separate from initial loading so SSE does not disable actions mid-interaction. Backend BOARD q filtering is a bounded parameterized read extension; no domain lock, migration, idempotency or SSE delivery change.
+
+Frontend verification uses Node built-in tests driving an isolated Chrome through CDP against Vite with fixture API/SSE responses. Separate opt-in browser journeys run against a packaged JVM, real PostgreSQL and Vite forwarding. This adds no frontend package/runtime dependency. Tests distinguish actual browser checks from mocked backend behavior; details and manual accessibility limitations are in verification-m6.md.
+
 ## M5 discovery/SSE/matching implementation
 Latest user scope moves live delivery into M5 and reserves M6 for later visual polish. This supersedes older milestone labels and statements that SSE/matching are absent. Admission locks and persisted key/replay semantics remain unchanged.
 

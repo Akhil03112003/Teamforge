@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError, updateProfile, type Profile, type AvailabilityWindow, type Day } from '../api/client';
+import { useMounted } from './useMounted';
 
 const days: Day[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 interface Slot extends AvailabilityWindow { key: string }
@@ -16,6 +17,8 @@ export default function ProfileForm({ profile, onSaved, onSessionExpired }: {
   const [error, setError] = useState<ApiError | null>(null);
   const [saved, setSaved] = useState(false);
   const summary = useRef<HTMLDivElement>(null);
+  const submitting = useRef(false);
+  const mounted = useMounted();
   useEffect(() => { if (error) summary.current?.focus(); }, [error]);
   const zones = [...new Set(['UTC', timeZone, ...Intl.supportedValuesOf('timeZone')])].sort();
 
@@ -24,23 +27,25 @@ export default function ProfileForm({ profile, onSaved, onSessionExpired }: {
     setSaved(false);
   }
   async function submit(event: FormEvent) {
-    event.preventDefault(); setBusy(true); setSaved(false); setError(null);
+    event.preventDefault(); if (submitting.current) return; submitting.current = true; setBusy(true); setSaved(false); setError(null);
     try {
       const result = await updateProfile({
         displayName: displayName.trim(), timeZone,
         skills: skills.split(',').map(skill => skill.trim()).filter(Boolean),
         collaborationWindows: slots.map(({ day, start, end }) => ({ day, start, end })),
       });
+      if (!mounted.current) return;
       onSaved(result); setSkills(result.skills.join(', ')); setSaved(true);
     } catch (reason) {
       const failure = ApiError.from(reason);
+      if (!mounted.current) return;
       if (failure.status === 401) onSessionExpired();
       else setError(failure);
-    } finally { setBusy(false); }
+    } finally { submitting.current = false; setBusy(false); }
   }
   return (
-    <form className="profile-form" onSubmit={submit} aria-busy={busy}>
-      {error && <div className="error-summary" role="alert" tabIndex={-1} ref={summary}>
+    <form className="profile-form" onSubmit={submit} aria-busy={busy} aria-describedby={error ? 'profile-errors' : undefined}>
+      {error && <div id="profile-errors" className="error-summary" role="alert" tabIndex={-1} ref={summary}>
         <p>{error.message}</p>
         {Object.entries(error.fieldErrors).map(([field, message]) => <p key={field}>{field}: {message}</p>)}
       </div>}
@@ -51,11 +56,11 @@ export default function ProfileForm({ profile, onSaved, onSessionExpired }: {
             <label htmlFor="profile-name">Display name</label>
             <input id="profile-name" autoComplete="nickname" required maxLength={80}
               value={displayName} onChange={event => { setDisplayName(event.target.value); setSaved(false); }}
-              aria-invalid={!!error?.fieldErrors.displayName} />
+              aria-describedby={error ? 'profile-errors' : undefined} aria-invalid={!!error?.fieldErrors.displayName} />
           </div>
           <div className="field">
             <label htmlFor="time-zone">Time zone</label>
-            <select id="time-zone" value={timeZone} onChange={event => { setTimeZone(event.target.value); setSaved(false); }}>
+            <select id="time-zone" value={timeZone} aria-invalid={!!error?.fieldErrors.timeZone} aria-describedby={error ? 'profile-errors' : undefined} onChange={event => { setTimeZone(event.target.value); setSaved(false); }}>
               {zones.map(zone => <option key={zone} value={zone}>{zone}</option>)}
             </select>
           </div>
@@ -63,7 +68,7 @@ export default function ProfileForm({ profile, onSaved, onSessionExpired }: {
         <div className="field">
           <label htmlFor="skills">Skills</label>
           <input id="skills" value={skills} onChange={event => { setSkills(event.target.value); setSaved(false); }}
-            aria-describedby="skills-hint" maxLength={820} />
+            aria-describedby={'skills-hint' + (error ? ' profile-errors' : '')} aria-invalid={!!error?.fieldErrors.skills} maxLength={820} />
           <p id="skills-hint" className="note">Up to 20 comma-separated skills, such as java, design, c++ or data science. Each tag can have up to 40 characters.</p>
         </div>
       </fieldset>

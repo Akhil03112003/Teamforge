@@ -1,5 +1,8 @@
 # API contract
 
+## M6 board search extension
+BOARD additionally accepts optional q (maximum120 characters). Trimmed, case-insensitive literal substring search over team name and description is applied inside event scope before pagination. Percent/underscore/quotes are literal characters, not wildcard/SQL syntax. Empty/blank q means no text filter; excessive length400. q combines with existing skill/openSeats/status/sort/limit/cursor; reset the cursor when q or other filters change. No response shape, authentication, CSRF or mutation/idempotency contract changed. Existing seven-argument BoardQuery callers remain compatible; the HTTP controller passes q to its read-only overload.
+
 ## M5 live discovery and matching (current)
 GET /api/v1/hackathons/{event}/teams retains limit1–50/default50 and UUID cursor/default sort=id. New filters: skill (one normalized exact desired-skill tag), openSeats=true, status=READY|INCOMPLETE, sort=id|name. Name sorting uses PostgreSQL lower(name) COLLATE C then UUID; its nextCursor is an opaque encoded name/UUID pair. Always reuse returned cursor with the same filters/sort; reset on change. Responses {items,nextCursor} add openSeats and leaderDisplayName to each summary. Existing name/description/memberCount/minSize/maxSize/readiness/leaderId remain. No private profile fields. Invalid filters/sort/cursor return400. Reads use a committed REPEATABLE READ snapshot and bounded set-based aggregation; pagination is deterministic for unchanged data, not a snapshot across HTTP requests. Rename/filter/capacity changes may move items; reconnect/invalidation resets to page1.
 

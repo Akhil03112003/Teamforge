@@ -1,5 +1,15 @@
 # Progress
 
+## Current status — M6 review handoff
+M0–M6 implemented; M6 automated, browser responsive/keyboard and production-bundle journey gates passed. Stop before M7; M7–M9 not started. Older handoffs below are historical.
+- Initial Git tree clean. Reverified170-test backend baseline on JDK21 (4m50s). Final clean verify:171 tests,0 failures/errors/skips, BUILD SUCCESS/executable packaging,4m20s. Original170 preserved plus one literal/event-scoped board-search case. V1–V6 unchanged; M3 locking/idempotency/domain services unchanged.
+- Cohesive app shell has Discover/My team/Invitations & requests/Profile, URL-backed hackathon restoration, whole-event search/filter/sort/pagination, native confirmations/copy, status/retry states and guarded/stale-safe mutations. SSE stays mounted across profile navigation; background refresh leaves loaded actions usable.
+- Frontend15 Node/Chrome tests passed (16.143s), typecheck/build passed (25 modules,207ms; JS265.11kB/gzip80.86kB, CSS12.37kB/gzip3.56kB). No frontend dependency installed. CI now invokes these tests but remote Actions not run.
+- Actual browser matrix1440×1000/768×1024/390×844 checked four views for overflow, labels, descriptions, heading hierarchy,44px targets and AX navigation. Keyboard skip-link/dialog Tab/Shift+Tab/Escape/focus restoration, computed contrast and reduced motion passed. Screenshots were inspected. No manual screen-reader/cross-browser/physical-device/complete WCAG result claimed.
+- Final packaged-backend/production-Vite-preview real PostgreSQL browser flow passed three-account registration/login/profile/create/invite/request/withdraw/accept/decline/remove/redeem/succession/delete/reload/logout. Includes actual mobile registration/request/redemption and successor actions. Standalone HTTP/Vite proxy board/SSE/reconnect smoke passed.
+- Earlier browser/harness timing/selector/focus failures were corrected/disclosed. Final frozen production run passed; only owned QA data/processes cleaned, immutable audits retained. Full results/remaining minor UX and manual accessibility limits: [verification](verification-m6.md).
+- No reset, commit/push, deployment/load/submission or M7 work. Native PostgreSQL18.6 retains the known Flyway version warning; Testcontainers/PG17.7 and remote CI remain unverified. Hosting remains open.
+
 ## Current status — M5 review handoff
 M0–M5 implemented; M5 automated gates and HTTP/proxy smoke passed. Stop before M6. Older handoffs below are historical; M6–M9 not started.
 - Initial Git tree clean. Original133-test M4 baseline reverified successfully (3m51s). Final JDK21 clean verify:170 tests, zero failures/errors/skips, BUILD SUCCESS/executable packaging,4m07s. New25 PostgreSQL/HTTP discovery and12 scoring cases; all133 regressions retained.

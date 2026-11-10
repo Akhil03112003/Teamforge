@@ -17,6 +17,10 @@ public class BoardQuery {
     public BoardQuery(JdbcTemplate jdbc,TeamStore teams){this.jdbc=jdbc;this.teams=teams;}
     @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
     public Page board(UUID event,String cursor,int limit,String skill,boolean openSeats,String status,String sort){
+        return board(event,cursor,limit,skill,openSeats,status,sort,null);
+    }
+    @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
+    public Page board(UUID event,String cursor,int limit,String skill,boolean openSeats,String status,String sort,String query){
         teams.event(event);
         if(limit<1 || limit>50 || !Set.of("id","name").contains(sort) || status!=null && !Set.of("READY","INCOMPLETE").contains(status))invalid();
         if(skill!=null){skill=skill.strip().toLowerCase(Locale.ROOT);if(!skill.matches("[a-z0-9][a-z0-9 +#./-]{0,39}"))invalid();}
@@ -31,6 +35,10 @@ public class BoardQuery {
         var params=new ArrayList<Object>();params.add(event);
         String filters="";
         if(skill!=null){filters+=" AND t.desired_skills @> ARRAY[?]::text[]";params.add(skill);}
+        if(query!=null && !query.isBlank()){
+            if(query.length()>120)invalid();
+            filters+=" AND strpos(lower(t.name || ' ' || t.description),lower(?))>0";params.add(query.strip());
+        }
         String paging=sort.equals("id")?"id>?":"(sort_name COLLATE \"C\",id)>(? COLLATE \"C\",?)";
         if(sort.equals("name"))params.add(afterName);params.add(after);
         String post=(openSeats?" AND open_seats>0":"")+(status==null?"":" AND status=?");

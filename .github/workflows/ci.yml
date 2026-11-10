@@ -59,3 +59,5 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
+      - name: Browser interaction and accessibility checks
+        run: npm test

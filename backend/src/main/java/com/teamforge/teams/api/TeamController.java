@@ -24,8 +24,9 @@ public class TeamController {
     public com.teamforge.teams.application.BoardQuery.Page board(@PathVariable UUID event, @RequestParam(required=false) String cursor,
                        @RequestParam(defaultValue="50") @Min(1) @Max(50) int limit,
                        @RequestParam(required=false) String skill,@RequestParam(defaultValue="false") boolean openSeats,
-                       @RequestParam(required=false) String status,@RequestParam(defaultValue="id") String sort) {
-        return board.board(event,cursor,limit,skill,openSeats,status,sort);
+                       @RequestParam(required=false) String status,@RequestParam(defaultValue="id") String sort,
+                       @RequestParam(required=false) @Size(max=120) String q) {
+        return board.board(event,cursor,limit,skill,openSeats,status,sort,q);
     }
     @GetMapping("/hackathons/{event}/me/team")
     public ResponseEntity<Team> mine(@PathVariable UUID event, @AuthenticationPrincipal ParticipantPrincipal actor) {

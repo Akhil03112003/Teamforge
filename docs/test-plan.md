@@ -1,5 +1,12 @@
 # Test plan
 
+## M6 browser verification
+`npm.cmd --prefix frontend test` runs15 Node/Chrome component-interaction and accessibility cases using explicit fixture API/SSE responses: mobile registration, login/error associations, keyboard navigation/skip-link route preservation, profile windows/save, duplicate creation/keys/CSRF, server search/filter parameters, invitation confirmation/copy, request withdrawal, dialog focus/Escape, SSE lifecycle/logout, responsive labels/IDs/targets/overflow, recovery messages, computed contrast/reduced-motion and URL event/history restoration/background-refresh controls.
+
+Viewport matrix:1440×1000,768×1024,390×844 across the four authenticated views. Chrome accessibility tree, visible heading hierarchy, associated inputs/descriptions,44px action targets, keyboard outline and text contrast thresholds are checked. This is a specific custom rule set, not an axe/WCAG certification or screen-reader test. Native Clipboard API is stubbed in component checks; production code has manual-copy fallback.
+
+`node frontend/tests/real-flow.mjs` is opt-in against a dedicated QA event with min2/max5 and existing servers; set TEAMFORGE_E2E_EVENT and TEAMFORGE_E2E_ORIGIN. It generates synthetic accounts, writes owned IDs to ignored .tmp/m6-e2e-fixtures.json and must be paired with owned-fixture cleanup. The session's private harness provisions/cleans only that event/accounts and runs genuine browser/CSRF/PostgreSQL/SSE journeys. Exact results, historical failures and remaining checks: verification-m6.md. Original170 backend cases plus a new q search case remain regression gates.
+
 ## M5 live discovery coverage
 LiveDiscoveryIntegrationTest adds25 real PostgreSQL/HTTP board paging/name ties/filter combinations/capacity/event scope/validation/committed-visibility checks; SSE after-commit coalescing, rollback silence, event scope, token/private-field redaction, heartbeats/disconnect cleanup, reconnect REST, logout/session handling, connection bounds and replay silence; suggestions authorization/exclusions/ranking/privacy/stability/limits/full-team/missing-profile cases. SuggestionScoringTest adds12 cases checking70/30 arithmetic, empty denominators, IANA overlap, explicit/default windows, DST, no double-counting and deterministic explanations. Existing133 regressions/public50-way admission races remain required.
 
