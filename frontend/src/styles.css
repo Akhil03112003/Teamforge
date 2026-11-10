@@ -14,7 +14,7 @@ h1, h2, h3 { line-height: 1.2; color: #18392c; text-wrap: balance; }
 h1 { font-size: clamp(1.9rem, 3vw, 2.7rem); letter-spacing: -.03em; margin: 0 0 12px; font-weight: 700; }
 h2 { font-size: 1.3rem; margin: 0 0 16px; }
 h3 { font-size: 1.07rem; margin: 28px 0 12px; }
-button, .button-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border: 1px solid transparent; border-radius: 8px; background: #245a43; color: #fff; font-weight: 650; padding: 10px 16px; cursor: pointer; text-decoration: none; transition: background-color 120ms ease-out; max-width: 100%; white-space: normal; }
+button, .button-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border: 1px solid transparent; border-radius: 8px; background: #245a43; color: #fff; font-weight: 650; padding: 10px 16px; cursor: pointer; text-decoration: none; transition: none; max-width: 100%; white-space: normal; }
 button:hover:not(:disabled), .button-link:hover { background: #194630; }
 button:disabled { background: #dce4dd; color: #546259; cursor: not-allowed; }
 .secondary { border-color: #95a99a; background: #fff; color: #254c3d; }

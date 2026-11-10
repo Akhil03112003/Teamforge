@@ -23,4 +23,14 @@
     <directory>${teamforge.build.directory}</directory>
     <plugins><plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId></plugin></plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>web</id>
+      <properties><frontend.dist.directory>${project.basedir}/../frontend/dist</frontend.dist.directory></properties>
+      <build><resources>
+        <resource><directory>src/main/resources</directory></resource>
+        <resource><directory>${frontend.dist.directory}</directory><targetPath>static</targetPath><filtering>false</filtering></resource>
+      </resources></build>
+    </profile>
+  </profiles>
 </project>

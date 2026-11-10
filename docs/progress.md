@@ -1,5 +1,14 @@
 # Progress
 
+## Current status — M7 review handoff
+M0–M7 implementation and feasible local M7 gates are complete for review; **hosted CI/container/production-platform verification remains open**. Stop before M8. All older handoffs below are historical.
+- Started clean on main at42af67a; origin unchanged. Reconfirmed171 backend/15 browser baseline. Final Java21 web-profile clean verify: **195 tests,0 failures/errors/skips**, BUILD SUCCESS,4m05s. Final frontend: **16 tests passed**,13.047s; typecheck/build passed. No passing GitHub-hosted result claimed.
+- CI now explicitly provisions Java21/Maven cache, PostgreSQL17.7, Node24 and Chrome/Linux dependencies; push/PR main/manual dispatch, restricted pinned actions, masked ephemeral credentials and test artifacts. GitHub API networking blocked; [trigger/inspect instructions](ci.md).
+- Hardened request/form/session bounds, production cookie/profile guards, safe errors/logging, browser headers and graceful SSE shutdown. Same-origin web-JAR packaging/non-root container recipe added; Docker daemon denied, image unbuilt. Local HTTP remains separate. M3 locks/idempotency and V1–V6 unchanged; all6 migrations validated on existing native PostgreSQL18.6 (known tested-version warning remains).
+- Public50-contender race passed:1 HTTP201/49 capacity409, correct roster/nonmembers,312ms, no deadlocks/timeouts. Existing full lifecycle/authentication/live/suggestion regressions preserved. Real packaged desktop/mobile browser journey passed40.341s; HTTP/Vite proxy board/SSE/reconnect smoke passed30.641s. Owned fixtures/processes only cleaned, immutable audits retained.
+- Browser run found/remedied redemption announcement lost during membership remount; new regression added. Contrast test found/fixed transient enabled-button contrast. Local npm ci hit an external native-file lock; dependencies restored without manifest/lockfile change, clean isolated npm ci passed. Failures and exact commands are disclosed in [M7 verification](verification-m7.md).
+- Formal CSO/advisory assessment not performed; production HTTPS/edge/signal checks, least-privilege roles, backup targets and provider/free-tier selection remain open. See [security](security.md) and [deployment prerequisites](deployment.md). No deployment/load claims, data reset, commit or push. M8/M9 not started.
+
 ## Current status — M6 review handoff
 M0–M6 implemented; M6 automated, browser responsive/keyboard and production-bundle journey gates passed. Stop before M7; M7–M9 not started. Older handoffs below are historical.
 - Initial Git tree clean. Reverified170-test backend baseline on JDK21 (4m50s). Final clean verify:171 tests,0 failures/errors/skips, BUILD SUCCESS/executable packaging,4m20s. Original170 preserved plus one literal/event-scoped board-search case. V1–V6 unchanged; M3 locking/idempotency/domain services unchanged.

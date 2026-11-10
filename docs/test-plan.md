@@ -1,5 +1,10 @@
 # Test plan
 
+## M7 regression gates
+Retain all 171 backend cases and 15 browser cases from M6. Add 24 backend cases: eight bounded-body/form/bootstrap/config checks, four production-guard checks, one real HTTP session-cap check, ten real PostgreSQL security-envelope/CSRF/leader/event/idempotency cases and one SSE shutdown cleanup check. Add one browser regression preserving redemption announcements through membership/SSE reconciliation. These support REQ-09/10/11/13/17 and retain all concurrency/rollback gates; exact executions/counts are in [M7 verification](verification-m7.md).
+
+CI must provision Java21, isolated PostgreSQL17.7 and Node24/Chrome/system libraries, run Maven clean verify with database tests enabled, npm ci/typecheck/browser tests/build and propagate failures. Remote hosted success must be observed separately. Test same-origin web-JAR packaging and genuine HTTP/Vite proxy board/SSE/reconnect plus authentication/lifecycle/invitation/request/suggestion journeys. Negative security cases must not print submitted secrets. Production HTTPS/edge/SIGTERM and Docker-image checks remain explicit platform gates; passing local tests does not establish seed-scale latency, SCA clearance or full security certification.
+
 ## M6 browser verification
 `npm.cmd --prefix frontend test` runs15 Node/Chrome component-interaction and accessibility cases using explicit fixture API/SSE responses: mobile registration, login/error associations, keyboard navigation/skip-link route preservation, profile windows/save, duplicate creation/keys/CSRF, server search/filter parameters, invitation confirmation/copy, request withdrawal, dialog focus/Escape, SSE lifecycle/logout, responsive labels/IDs/targets/overflow, recovery messages, computed contrast/reduced-motion and URL event/history restoration/background-refresh controls.
 

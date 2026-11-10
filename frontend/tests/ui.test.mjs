@@ -185,3 +185,17 @@ test('background request reconciliation does not disable already loaded actions'
     assert.equal(await page.evaluate(`[...document.querySelectorAll('button')].find(e=>e.textContent==='Generate / rotate invitation').disabled`), false);
   } finally { await page.close(); }
 });
+
+test('successful invitation announcement survives authoritative membership reconciliation', async () => {
+  const page = await tab(true, false); try {
+    await route(page, 'Invitations & requests', 'Invitation code');
+    await page.fill('invite-code', 'A'.repeat(43)); await page.click('Redeem invitation');
+    // The changed own-team value used to remount this panel and erase the result.
+    await page.ready('Generate / rotate invitation');
+    assert.equal(await page.evaluate(`document.body.innerText.includes('Admission confirmed.')`), true);
+    const before = await page.evaluate(`fixture.calls.filter(x=>x.p.endsWith('/me/team')).length`);
+    await page.evaluate(`fixture.streams.find(x=>!x.closed).dispatchEvent(new Event('invalidate'));`);
+    await waitFor(async () => (await page.evaluate(`fixture.calls.filter(x=>x.p.endsWith('/me/team')).length`)) > before);
+    assert.equal(await page.evaluate(`document.body.innerText.includes('Admission confirmed.')`), true);
+  } finally { await page.close(); }
+});

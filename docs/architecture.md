@@ -1,5 +1,10 @@
 # Architecture
 
+## M7 release and security hardening
+The modular monolith, PostgreSQL invariants, M3 lock ordering and atomic idempotency semantics are unchanged. Optional Maven `web` packaging serves the built React assets from the same JAR/origin; the multi-stage non-root Dockerfile is a portable release recipe, not a deployed/tested image. Hosting remains open. CI uses isolated PostgreSQL and explicit Linux Chrome provisioning; see [CI](ci.md).
+
+Security adds pre-CSRF bounded request/form parsing, anonymous session-bootstrap throttling, a Tomcat session cap without disk persistence, safe error envelopes/logging and restrictive same-origin browser headers. `prod` refuses insecure cookies or `local` profile combination. Local HTTP remains explicitly separate. Flyway may use dedicated migration credentials; runtime Hibernate only validates schema. Graceful shutdown closes SSE on context-close before draining HTTP. No shared/distributed infrastructure was added. See [security](security.md), [release prerequisites](deployment.md) and [verification](verification-m7.md). Older foundational/proposed sections below are historical where superseded by implemented milestone sections.
+
 ## M6 UI completion
 Hash-based application views retain a single mounted dashboard/live subscription and independent profile draft. Only a public hackathon ID enters the URL; session credentials/invitations never enter persistent browser storage. Typed API/CSRF paths and M3 mutations remain intact. Native dialogs/disclosures reduce custom focus/navigation logic; imperative action guards, mounted-response checks and selection guards prevent duplicate/stale UI effects. Workflow background refresh is separate from initial loading so SSE does not disable actions mid-interaction. Backend BOARD q filtering is a bounded parameterized read extension; no domain lock, migration, idempotency or SSE delivery change.
 

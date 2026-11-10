@@ -1,5 +1,14 @@
 # Decisions
 
+## M7 implementation decisions — 2026-11-10
+Approved scope remains the single modular monolith, local credentials/server-managed sessions and unchanged M3 locks/idempotency. No core business rule changed.
+
+Implemented: explicit Java21/PostgreSQL17.7/Node24/Chrome CI with pinned action SHAs and restricted permissions; optional same-origin web-JAR packaging and non-root multi-stage container recipe; fail-closed production cookie/profile guard; bounded request/form/session bootstrap/session-count controls; safe fallback errors/SQL-detail logging suppression; restrictive browser headers; graceful shutdown including SSE close. Flyway can use a separate migration identity, with local fallback preserved. Technical defaults and production conditions are in [security](security.md), [CI](ci.md) and [deployment](deployment.md).
+
+Runtime release review found invitation success status erased by a membership-triggered UI remount; a stable requests-panel key preserves the announcement and a browser regression covers reconciliation. This changes UI state retention only.
+
+Unresolved: deployment provider/free-tier feasibility, least-privilege production role provisioning, TLS/edge behavior, backup/recovery targets, image digest/advisory review, actual hosted CI and target-platform signal/restart verification. Single-instance in-memory sessions/SSE/rate limits are the operating boundary; no distributed design was introduced. Optional CSO automated assessment unavailable (required launcher absent), not assessed. M8 seed/benchmark and deployment remain out of scope.
+
 ## M6 product UI and accessibility — 2026-11-10
 User authorizes complete product UI/accessibility only. Preserve forest-green identity and use a restrained Segoe/system UI, light work surfaces, explicit status text, consistent spacing/borders/forms/44px targets. Desktop sidebar becomes compact mobile navigation; hash routes cover Discover/My team/Invitations & requests/Profile without a routing dependency. Public hackathon selection is stored only in the URL and restored on refresh/history navigation; no identity/session/invite credentials in localStorage/sessionStorage.
 

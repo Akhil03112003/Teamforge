@@ -1,5 +1,10 @@
 # API contract
 
+## M7 security envelope (no business endpoint changes)
+API mutation bodies are bounded to 65,536 bytes by default, including chunked bodies; oversize returns `413 REQUEST_TOO_LARGE`. Malformed/duplicate form fields return `400 INVALID_REQUEST`. Login credentials must be body-encoded; login query strings are rejected. Unsupported media types/methods retain their 4xx status with a safe envelope. Unexpected errors return `500 INTERNAL_ERROR` and an opaque requestId, never submitted content/stack traces.
+
+Anonymous CSRF bootstrap has a default 300-new-sessions/IP/minute limit (`429 RATE_LIMITED`); global session exhaustion returns `503 SESSION_CAPACITY`. Both carry `Retry-After: 60`. Existing authenticated sessions and public health remain usable. Existing auth/invite throttles remain active. Cookie-authenticated mutations still require CSRF; no authorization/idempotency relaxation. Same-origin CSP/no-referrer/permissions headers apply to APIs and packaged assets. During shutdown new streams receive `503 STREAM_UNAVAILABLE`; active streams close and clients reconcile after reconnect. Configuration and operating limits: [security](security.md). HTTPS production and explicit local-HTTP profiles: [deployment](deployment.md).
+
 ## M6 board search extension
 BOARD additionally accepts optional q (maximum120 characters). Trimmed, case-insensitive literal substring search over team name and description is applied inside event scope before pagination. Percent/underscore/quotes are literal characters, not wildcard/SQL syntax. Empty/blank q means no text filter; excessive length400. q combines with existing skill/openSeats/status/sort/limit/cursor; reset the cursor when q or other filters change. No response shape, authentication, CSRF or mutation/idempotency contract changed. Existing seven-argument BoardQuery callers remain compatible; the HTTP controller passes q to its read-only overload.
 

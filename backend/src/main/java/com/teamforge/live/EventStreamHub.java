@@ -8,6 +8,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.transaction.support.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.teamforge.platform.api.ApiException;
@@ -19,6 +21,7 @@ public class EventStreamHub {
     private final ScheduledExecutorService timer=Executors.newSingleThreadScheduledExecutor(Thread.ofPlatform().daemon().name("sse-heartbeat").factory());
     private final int maximum,perUser,buffer;
     private final long heartbeat,timeout;
+    private boolean stopping;
     public EventStreamHub(@Value("${teamforge.sse.max-connections:10000}") int maximum,
         @Value("${teamforge.sse.per-user:2}") int perUser,@Value("${teamforge.sse.buffer:16}") int buffer,
         @Value("${teamforge.sse.heartbeat-ms:15000}") long heartbeat,@Value("${teamforge.sse.timeout-ms:1800000}") long timeout) {
@@ -59,6 +62,7 @@ public class EventStreamHub {
         }
     }
     public synchronized Subscription subscribe(UUID event,UUID user,HttpSession session) {
+        if(stopping)throw new ApiException(503,"STREAM_UNAVAILABLE","Live updates are restarting. Retry shortly.");
         if(session==null)throw new ApiException(401,"UNAUTHENTICATED","Sign in to continue.");
         if(subscribers.size()>=maximum || subscribers.values().stream().filter(s->s.user.equals(user)).count()>=perUser)
             throw new ApiException(429,"STREAM_LIMIT","Too many live connections. Close another tab or retry shortly.");
@@ -80,5 +84,6 @@ public class EventStreamHub {
         final Set<UUID> events=new HashSet<>();
         @Override public void afterCommit(){for(UUID event:events)publish(event);}
     }
-    @PreDestroy public void shutdown(){timer.shutdownNow();for(var subscription:List.copyOf(subscribers.values()))subscription.close();}
+    @EventListener(ContextClosedEvent.class)
+    @PreDestroy public synchronized void shutdown(){stopping=true;timer.shutdownNow();for(var subscription:List.copyOf(subscribers.values()))subscription.close();}
 }

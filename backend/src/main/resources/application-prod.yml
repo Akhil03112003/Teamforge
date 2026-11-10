@@ -1,0 +1,8 @@
+# Activate explicitly after TLS, database roles and edge controls are configured.
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
+        http-only: true
+        same-site: lax

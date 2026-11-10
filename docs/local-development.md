@@ -1,5 +1,8 @@
 # TeamForge local development (M1/M2)
 
+## M7 verification and release boundary
+Local HTTP still requires the explicit `local` profile; fresh-terminal environment/startup commands below remain valid. Production must use `prod`, secure cookies and a trusted HTTPS edge, with no `local` combination. See [CI commands](ci.md), [security limits](security.md) and [portable web-JAR/container preparation](deployment.md). The browser suite now has16 cases, including preservation of the invitation-redemption announcement through membership refresh; earlier15-case counts below are historical. If `npm ci` encounters a native file held by an existing Vite/IDE process, stop that owned process in your normal terminal or use a separate checkout; do not kill unrelated services. M7 verified clean lockfile installation in an isolated ignored directory.
+
 ## M6 frontend checks
 From the repository root, with existing frontend dependencies installed:
 

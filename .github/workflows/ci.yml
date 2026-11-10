@@ -1,21 +1,30 @@
-name: Foundation checks
+name: TeamForge CI
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
+  workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   backend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
         with:
           distribution: temurin
           java-version: '21'
           cache: maven
           cache-dependency-path: backend/pom.xml
-      - name: Start ephemeral PostgreSQL
+      - name: Start isolated PostgreSQL 17.7
         shell: bash
         run: |
           password="$(openssl rand -hex 24)"
@@ -29,35 +38,54 @@ jobs:
             sleep 2
           done
           exit 1
-      - name: Compile, migrate and test
-        working-directory: backend
+      - name: Clean compile, Flyway validation, all tests and packaging
         env:
-          DB_URL: jdbc:postgresql://localhost:5432/teamforge
+          DB_URL: jdbc:postgresql://127.0.0.1:5432/teamforge
           DB_USERNAME: teamforge
           TEAMFORGE_DATABASE_TESTS: 'true'
-        run: mvn --batch-mode --no-transfer-progress verify
-      - uses: actions/upload-artifact@v4
+        run: mvn --batch-mode --no-transfer-progress -f backend/pom.xml clean verify
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: backend-test-reports
           path: backend/target/surefire-reports/
-      - name: Stop database
+          retention-days: 7
+      - name: Stop owned CI database
         if: always()
         run: docker rm -f teamforge-ci
   frontend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '24'
           cache: npm
           cache-dependency-path: frontend/package-lock.json
+      - name: Provision Chrome and Linux system libraries
+        id: chrome
+        uses: browser-actions/setup-chrome@48ad923757ca74d66703209fe939badbdf80f2f4 # v2.2.0
+        with:
+          chrome-version: stable
+          install-dependencies: true
       - run: npm ci
       - run: npm run typecheck
-      - run: npm run build
-      - name: Browser interaction and accessibility checks
+      - name: Component, keyboard, responsive and accessibility checks
+        env:
+          BROWSER_BIN: ${{ steps.chrome.outputs.chrome-path }}
         run: npm test
+      - run: npm run build
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: frontend-qa-screenshots
+          path: .tmp/m6-*.png
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7

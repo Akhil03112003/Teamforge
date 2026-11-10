@@ -10,16 +10,49 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:10}
+      connection-timeout: 10000
+      validation-timeout: 3000
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: validate
   flyway:
     enabled: true
+    clean-disabled: true
+    url: ${FLYWAY_DB_URL:${DB_URL}}
+    user: ${FLYWAY_DB_USERNAME:${DB_USERNAME}}
+    password: ${FLYWAY_DB_PASSWORD:${DB_PASSWORD}}
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  servlet:
+    multipart:
+      enabled: false
+  mvc:
+    log-request-details: false
+logging:
+  level:
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: 'OFF'
+    org.hibernate.orm.jdbc.bind: 'OFF'
 server:
   port: ${PORT:8080}
+  shutdown: graceful
+  forward-headers-strategy: none
+  max-http-request-header-size: 16KB
+  tomcat:
+    max-http-form-post-size: 64KB
+    max-swallow-size: 64KB
+    connection-timeout: 20s
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-exception: false
+    include-binding-errors: never
   servlet:
     session:
+      timeout: 30m
+      tracking-modes: cookie
       cookie:
         http-only: true
         secure: true

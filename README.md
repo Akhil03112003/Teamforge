@@ -1,4 +1,6 @@
 # TeamForge
+
+M7 adds CI, security and release hardening. Start with [local development](docs/local-development.md); review [CI](docs/ci.md), [security](docs/security.md), [deployment prerequisites](docs/deployment.md) and [M7 verification](docs/verification-m7.md). Hosting/remote CI remain unverified; no M8 load result or live deployment is claimed. The newest entry in [progress](docs/progress.md) supersedes historical milestone notes.
 Production-oriented hackathon team formation for 10,000 participants and 2,000 teams.
 
 Spring Boot/PostgreSQL backend and React/TypeScript/Vite frontend. Authentication/profiles, team lifecycle, persisted idempotency, invitations/requests, filtered live discovery, SSE invalidation and explainable teammate suggestions are implemented.

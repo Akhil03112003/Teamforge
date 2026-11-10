@@ -14,6 +14,20 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+    private static final org.slf4j.Logger LOG=org.slf4j.LoggerFactory.getLogger(ApiExceptionHandler.class);
+    @ExceptionHandler(Exception.class)
+    ResponseEntity<ApiErrors.ErrorBody> unexpected(Exception error){
+        if(error instanceof org.springframework.web.ErrorResponse request && request.getStatusCode().is4xxClientError())
+            return ResponseEntity.status(request.getStatusCode()).body(ApiErrors.body("INVALID_REQUEST","The request could not be processed.",Map.of()));
+        for(Throwable cause=error;cause!=null;cause=cause.getCause()){
+            if(cause instanceof org.apache.catalina.session.TooManyActiveSessionsException)
+                return ResponseEntity.status(503).header("Retry-After","60").body(ApiErrors.body("SESSION_CAPACITY","Session capacity reached. Retry shortly.",Map.of()));
+            if(cause.getCause()==cause)break;
+        }
+        var body=ApiErrors.body("INTERNAL_ERROR","An unexpected error occurred. Retry after checking current state.",Map.of());
+        LOG.error("request_failed id={} exception={}",body.requestId(),error.getClass().getSimpleName());
+        return ResponseEntity.internalServerError().body(body);
+    }
     @ExceptionHandler({ConstraintViolationException.class, MethodArgumentTypeMismatchException.class})
     ResponseEntity<ApiErrors.ErrorBody> parameters() {
         return ResponseEntity.badRequest().body(ApiErrors.body(

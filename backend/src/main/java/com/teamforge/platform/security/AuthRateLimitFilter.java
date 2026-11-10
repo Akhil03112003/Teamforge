@@ -19,6 +19,7 @@ public final class AuthRateLimitFilter extends OncePerRequestFilter {
     private final Clock clock;
     private final int limit;
     public AuthRateLimitFilter(ObjectMapper mapper, Clock clock, int limit) {
+        if(limit<1 || limit>100000)throw new IllegalArgumentException("Invalid authentication rate bound.");
         this.mapper = mapper; this.clock = clock; this.limit = limit;
     }
     private synchronized boolean allow(String key) {

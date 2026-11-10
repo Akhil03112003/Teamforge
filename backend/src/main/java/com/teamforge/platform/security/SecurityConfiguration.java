@@ -22,12 +22,15 @@ public class SecurityConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper mapper,
         @Value("${teamforge.security.auth-attempts-per-minute:30}") int attemptsPerMinute,
-        @Value("${teamforge.security.invite-attempts-per-minute:60}") int inviteAttempts) throws Exception {
+        @Value("${teamforge.security.invite-attempts-per-minute:60}") int inviteAttempts,
+        @Value("${teamforge.security.max-request-bytes:65536}") int requestBytes,
+        @Value("${teamforge.security.new-sessions-per-minute:300}") int bootstrapLimit) throws Exception {
         return http
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.GET, "/api/v1/health", "/actuator/health",
                     "/actuator/health/liveness", "/actuator/health/readiness").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/auth/csrf").permitAll()
+                .requestMatchers(HttpMethod.GET,"/","/index.html","/assets/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
                 .requestMatchers("/api/v1/me", "/api/v1/me/profile").authenticated()
                 .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ASYNC).permitAll()
@@ -42,6 +45,10 @@ public class SecurityConfiguration {
                     "/api/v1/teams/*/requests/*/accept", "/api/v1/teams/*/requests/*/decline").authenticated()
                 .anyRequest().denyAll())
             .requestCache(cache -> cache.disable())
+            .headers(headers -> headers
+                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"))
+                .referrerPolicy(referrer -> referrer.policy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
+                .permissionsPolicy(permissions -> permissions.policy("camera=(), microphone=(), geolocation=()")))
             .sessionManagement(session -> session.sessionFixation(fixation -> fixation.changeSessionId()))
             .formLogin(form -> form.loginPage("/api/v1/auth/login")
                 .loginProcessingUrl("/api/v1/auth/login").usernameParameter("email")
@@ -52,6 +59,7 @@ public class SecurityConfiguration {
                 .logoutSuccessHandler((request, response, authentication) -> response.setStatus(204)))
             .addFilterBefore(new AuthRateLimitFilter(mapper, Clock.systemUTC(), attemptsPerMinute),
                 UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new RequestLimitsFilter(mapper,requestBytes,bootstrapLimit),org.springframework.security.web.csrf.CsrfFilter.class)
             .addFilterAfter(new InviteRateLimitFilter(mapper,inviteAttempts),
                 org.springframework.security.web.access.intercept.AuthorizationFilter.class)
             // Session-backed CSRF remains enabled, including registration/login/logout.
