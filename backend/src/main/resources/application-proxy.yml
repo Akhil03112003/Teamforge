@@ -1,0 +1,15 @@
+# Opt in only with prod and an edge whose immediate peer IPs are explicitly trusted.
+spring:
+  config:
+    activate:
+      on-profile: prod
+server:
+  forward-headers-strategy: native
+  tomcat:
+    redirect-context-root: false
+    remoteip:
+      internal-proxies: ${TRUSTED_PROXY_REGEX:}
+      remote-ip-header: X-Forwarded-For
+      protocol-header: X-Forwarded-Proto
+      host-header: X-Forwarded-Host
+      port-header: X-Forwarded-Port

@@ -1,0 +1,11 @@
+{
+  "tests": 206,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "java": "21.0.13.9",
+  "maven": "3.9.12",
+  "elapsedMaven": "4m33s",
+  "database": "native PostgreSQL18.6; isolated schema",
+  "hostedCI": "unverified"
+}

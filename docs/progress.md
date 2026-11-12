@@ -1,5 +1,13 @@
 # Progress
 
+## Current status - M8-B preparation complete for review
+No external provisioning/deployment, commit or push. Stop for hosting/domain/budget selection and explicit approval; public release remains blocked on provider-specific gates.
+- Java21 clean verify:206 tests,0 failures/errors/skips,4m33s; all201 baseline tests preserved. Public50 race:1 success/49 capacity conflicts,354ms. Frontend typecheck/build and16 browser tests passed.
+- Same-origin packaged JAR verified through certificate-validated local HTTPS proxy: secure session flags, CSRF, auth, board, committed SSE invalidation,15s heartbeats and logout. Isolated V1-V6 startup and graceful context shutdown passed. Local results are not production/container verification.
+- Added opt-in trusted-proxy profile, guard regressions, runtime health probe and deployment/smoke/rollback guidance. No membership/idempotency/migration/pool/benchmark changes. Seed fingerprint and development public counts unchanged.
+- Docker image/non-root/SIGTERM, managed DB TLS/role grants/backups, real edge behavior, image scanning and hosted CI remain unverified. M8-A passing benchmark remains historical, not a production guarantee.
+- [Actual results and changed files](verification-m8-b.md), [hosting checklist and commands](deployment.md). M9 not started.
+
 ## Current status — M8-A optimization complete for review
 All authorized Phases A–D and local acceptance gates completed. **Comparable k6 p9542.566ms passed200ms**, with198,602 measured requests,100% success,1103.344 requests/s,p506.008ms,p99101.721ms,exit0. Same unchanged100-VU/30s/180s script/seed/request mix and pool10; original602.705ms failure preserved. Stop before M8-B deployment.
 - Cursor now reuses PostgreSQL's returned key. Candidate counts use existing name/member indexes; capacity/readiness filter before LIMIT, materialized page before wide/profile joins. Same REPEATABLE READ and response contract; no schema, M3 lock/admission/idempotency or datasource-default changes.

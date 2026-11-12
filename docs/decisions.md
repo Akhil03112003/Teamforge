@@ -1,5 +1,12 @@
 # Decisions
 
+## M8-B deployment preparation - 2026-11-10
+User authorized preparation/local verification only. Same-origin packaged web JAR and single-instance managed PostgreSQL direction retained; provider, domain, budget and resource/deployment approval remain open. No external resources or publication.
+
+Forwarding stays disabled by default. Explicit `prod,proxy` opts into Tomcat native forwarding only with a reviewed immediate-peer regex; production guard rejects missing/invalid/obviously unrestricted rules and alternative trust modes. This does not replace private-origin controls/header sanitization or provider network review. Local real HTTP regressions and certificate-verified TLS proxy smoke passed. Container gets a JRE-only readiness probe; no additional runtime package/service. Secure cookies, session CSRF and all M3 rules unchanged.
+
+Deployment guide proposes scoped migrator/runtime roles and verified-TLS managed DB connections. Startup Flyway remains default; choosing a separate private migration job versus holding migration credentials in the JVM awaits provider review. Container image/non-root/signals, real edge, managed DB TLS/roles/backup and hosted CI are unverified. Local206 backend/16 browser results are not production verification. See [verification](verification-m8-b.md) and [deployment](deployment.md).
+
 ## M8-A authorized optimization — 2026-11-10
 User explicitly authorized phased cursor/query optimization, pool experiments and a comparable rerun. Implemented native cursor-key reuse plus indexed LATERAL candidate roster counts, with capacity/readiness filters before the materialized page and profile joins afterward. Read-only REPEATABLE READ, min/max/404/event scope, API response/cursor semantics, M3 locks/idempotency and migrations remain unchanged. Compared narrower aggregate and indexed-count prototypes before selecting the latter from actual plans/payload equivalence.
 

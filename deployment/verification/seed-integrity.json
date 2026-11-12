@@ -1,0 +1,26 @@
+{
+  "database": "teamforge_db",
+  "dataset": "teamforge-m8a-v1",
+  "eventId": "749c9df6-f6ba-5bab-a480-b902d7ddb3db",
+  "exactFixtureMatch": true,
+  "fingerprint": "9dcec261ba2afa9266181d345b66e30756000ddd882ccdc072e88c4b8f1f60fc",
+  "integrity": {
+    "anchors": 10000,
+    "auditEvents": 6000,
+    "capacityViolations": 0,
+    "duplicateMemberships": 0,
+    "invalidLeaders": 0,
+    "memberships": 6000,
+    "profiles": 10000,
+    "sizeDistribution": {
+      "1": 400,
+      "2": 400,
+      "3": 400,
+      "4": 400,
+      "5": 400
+    },
+    "teams": 2000,
+    "users": 10000
+  },
+  "schema": "teamforge_benchmark_m8a"
+}

@@ -1,0 +1,32 @@
+{
+  "schema": "teamforge_benchmark_m8b_smoke_retry",
+  "publicBefore": {
+    "users": 0,
+    "teams": 0,
+    "members": 0,
+    "audits": 5667,
+    "profiles": 0
+  },
+  "databaseTls": "not tested: local PostgreSQL connection",
+  "proxy": "owned Python TLS edge, upstream source127.0.0.2; overwrites forwarding headers and flushes SSE lines",
+  "readinessProbeBeforeStartup": 1,
+  "readinessProbeHealthy": 0,
+  "untrustedForwardedHttpsIgnored": true,
+  "controlledShutdown": {
+    "appExit": 0,
+    "seconds": 12.0,
+    "sseClosed": true,
+    "method": "local-only Spring admin JMX context shutdown; NOT Linux SIGTERM verification"
+  },
+  "publicAfter": {
+    "users": 0,
+    "teams": 0,
+    "members": 0,
+    "audits": 5667,
+    "profiles": 0
+  },
+  "flywayVersions": "1,2,3,4,5,6",
+  "nonRootContainer": "unverified: Docker daemon inaccessible",
+  "containerSigterm": "unverified",
+  "status": "passed-local-production-like-checks"
+}

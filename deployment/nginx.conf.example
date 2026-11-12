@@ -1,0 +1,37 @@
+# REFERENCE ONLY: replace domain/certificate paths and restrict backend networking.
+# This models the FIRST public TLS edge; an additional LB requires its own reviewed trust chain.
+events {}
+http {
+  access_log off; # Define an approved redacted logging policy before enabling.
+  server {
+    listen 80;
+    server_name replace.example.invalid;
+    return 308 https://replace.example.invalid$request_uri;
+  }
+  server {
+    listen 443 ssl;
+    server_name replace.example.invalid;
+    ssl_certificate /run/secrets/public-fullchain.pem;
+    ssl_certificate_key /run/secrets/public-private.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    client_max_body_size 64k;
+    location / {
+      proxy_pass http://127.0.0.1:8080;
+      proxy_http_version 1.1;
+      proxy_set_header Host replace.example.invalid;
+      proxy_set_header X-Forwarded-Host replace.example.invalid;
+      proxy_set_header X-Forwarded-Port 443;
+      proxy_set_header X-Forwarded-Proto https;
+      proxy_set_header X-Forwarded-For $remote_addr;
+      proxy_set_header Forwarded "";
+      proxy_set_header Connection "";
+      proxy_buffering off;
+      proxy_cache off;
+      gzip off;
+      proxy_read_timeout 75s;
+      proxy_send_timeout 75s;
+      send_timeout 75s;
+    }
+  }
+}

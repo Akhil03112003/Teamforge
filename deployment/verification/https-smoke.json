@@ -1,0 +1,18 @@
+{
+  "baseUrl": "https://localhost:8443",
+  "tlsVerification": true,
+  "writeFixture": true,
+  "checks": [
+    "public health/liveness/readiness",
+    "same-origin HTML/JS/CSS and browser policy",
+    "Secure/HttpOnly/SameSite session cookie",
+    "session login/restoration and mutation CSRF rejection",
+    "committed team mutation -> SSE invalidation -> REST",
+    "same-origin SSE ready/two spaced heartbeats, no buffering",
+    "owned final-member team cleanup",
+    "logout invalidation"
+  ],
+  "heartbeatGapSeconds": 15.0,
+  "status": "passed",
+  "elapsedSeconds": 61.031
+}
