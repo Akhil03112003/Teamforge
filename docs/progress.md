@@ -1,5 +1,9 @@
 # Progress
 
+## UI follow-up — persistent sign-out
+- Moved Sign out to the sticky signed-in header on desktop and mobile. Added short control transitions and a confirmation-dialog entrance that respect reduced-motion preferences.
+- Frontend build and all 16 browser tests passed, including the sign-out scroll regression at three widths. The local benchmark fixture verified an exact match with 10,000 users and 2,000 teams. The 100-VU load result was checked against the saved report.
+
 ## Current status - M8-B preparation complete for review
 No external provisioning/deployment, commit or push. Stop for hosting/domain/budget selection and explicit approval; public release remains blocked on provider-specific gates.
 - Java21 clean verify:206 tests,0 failures/errors/skips,4m33s; all201 baseline tests preserved. Public50 race:1 success/49 capacity conflicts,354ms. Frontend typecheck/build and16 browser tests passed.

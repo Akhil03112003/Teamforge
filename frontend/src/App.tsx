@@ -46,12 +46,11 @@ export default function App() {
   }
   return <>
     <a className="skip-link" href="#main" onClick={event => { event.preventDefault(); main.current?.focus(); main.current?.scrollIntoView({ block: 'start' }); }}>Skip to main content</a>
-    <header className="app-header"><a className="wordmark" href="#discover" aria-label="TeamForge home"><span className="brand-mark" aria-hidden="true">T</span>TeamForge</a>
-      <span className="header-purpose">Make room for a great team.</span>{user && <><span className="account-name">{user.profile.displayName}</span><button className="secondary mobile-signout" type="button" disabled={busy} onClick={() => { void signOut(); }}>{busy ? 'Signing out…' : 'Sign out'}</button></>}
+    <header className={user ? 'app-header signed-in' : 'app-header'}><a className="wordmark" href="#discover" aria-label="TeamForge home"><span className="brand-mark" aria-hidden="true">T</span>TeamForge</a>
+      <span className="header-purpose">Make room for a great team.</span>{user && <><span className="account-name">{user.profile.displayName}</span><button className="secondary signout" type="button" disabled={busy} onClick={() => { void signOut(); }}>{busy ? 'Signing out…' : 'Sign out'}</button></>}
     </header>
     <div className={user ? 'app-shell' : 'welcome-shell'}>
       {user && <aside className="app-sidebar"><nav aria-label="Main navigation">{navigation.map(item => <a key={item.id} href={'#' + item.id} aria-current={view === item.id ? 'page' : undefined}><strong>{item.label}</strong><span>{item.hint}</span></a>)}</nav>
-        <div className="sidebar-account"><span className="avatar" aria-hidden="true">{user.profile.displayName.slice(0, 1).toUpperCase()}</span><p><strong>{user.profile.displayName}</strong><span>Participant workspace</span></p><button type="button" className="secondary" disabled={busy} onClick={() => { void signOut(); }}>{busy ? 'Signing out…' : 'Sign out'}</button></div>
       </aside>}
       <main id="main" ref={main} tabIndex={-1} className={user ? 'workspace' : 'welcome-main'}>
         {restoring ? <div role="status" className="loading-state"><span className="skeleton" />Restoring your session…</div> : !user && error ? <section className="empty-state"><h1>Let’s reconnect</h1><p role="alert">{error}</p><button type="button" onClick={() => setAttempt(value => value + 1)}>Retry connection</button></section> : user ? <>

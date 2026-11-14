@@ -125,6 +125,20 @@ test('responsive pages have labels, valid descriptions, touch targets and no hor
         if (name === 'Discover teams') await page.screenshot('m6-discover-' + width);
       }
       await page.screenshot('m6-profile-' + width);
+      await page.viewport(width, 600);
+      const signOutStaysVisible = await page.evaluate(`(() => {
+        const button = document.querySelector('.signout');
+        const originalScroll = scrollY;
+        scrollTo(0, 0);
+        const top = button.getBoundingClientRect().top;
+        scrollTo(0, document.documentElement.scrollHeight);
+        const bottomPosition = button.getBoundingClientRect();
+        const staysVisible = scrollY > 0 && Math.abs(bottomPosition.top - top) < 1
+          && bottomPosition.top >= 0 && bottomPosition.bottom <= innerHeight;
+        scrollTo(0, originalScroll);
+        return staysVisible;
+      })()`);
+      assert.equal(signOutStaysVisible, true, 'Sign out stays visible while scrolling at width ' + width);
     }
     const ax = await page.call('Accessibility.getFullAXTree'); assert.ok(ax.nodes.some(node => node.role?.value === 'navigation' && node.name?.value === 'Main navigation'));
   } finally { await page.close(); }
